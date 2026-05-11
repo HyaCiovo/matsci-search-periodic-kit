@@ -1,0 +1,389 @@
+.ms-pt-reference-story-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 1440px;
+  min-width: 1440px;
+  max-width: 1440px;
+  overflow-x: visible;
+  padding: 1.5rem;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.ms-pt-reference-table {
+  --ms-pt-element-size-spaced: 56px;
+  --ms-pt-spacer-spaced: 4px;
+  --ms-pt-reference-sidebar-width: 1.25rem;
+  --ms-pt-reference-topbar-height: 1.25rem;
+  --ms-pt-reference-column-gap: 0.16rem;
+  --ms-pt-reference-row-gap: 0.1rem;
+  --ms-pt-reference-bar-background: #d7d8dc;
+  --ms-pt-reference-bar-foreground: #3f4650;
+  --ms-pt-reference-bar-radius: 0.45rem;
+  --ms-pt-reference-number-font-size: 0.72rem;
+  --ms-pt-reference-symbol-font-size: 1.42rem;
+  --ms-pt-reference-name-font-size: 0.68rem;
+  --ms-pt-reference-name-bottom: 0.16rem;
+  --ms-pt-reference-accent-bottom: 0.02rem;
+  --ms-pt-reference-group-number-top: 0.16rem;
+  --ms-pt-reference-group-symbol-top: 1.08rem;
+  --ms-pt-reference-total-height: calc(
+    (9 * var(--ms-pt-element-size-spaced)) + var(--ms-pt-spacer-spaced) + (9 * var(--ms-pt-reference-row-gap))
+  );
+  position: relative;
+  width: max-content;
+  min-width: 0;
+  padding: calc(var(--ms-pt-reference-topbar-height) + 0.28rem) 0 0
+    calc(var(--ms-pt-reference-sidebar-width) + 0.28rem);
+}
+
+.ms-pt-reference-table .ms-table-container.ms-spaced {
+  position: relative;
+  width: max-content;
+  z-index: 1;
+  grid-template-columns: repeat(18, var(--ms-pt-element-size-spaced));
+  grid-template-rows: repeat(7, var(--ms-pt-element-size-spaced)) var(--ms-pt-spacer-spaced) repeat(2, var(--ms-pt-element-size-spaced));
+  gap: var(--ms-pt-reference-row-gap) var(--ms-pt-reference-column-gap);
+}
+
+.ms-pt-reference-topbar {
+  position: absolute;
+  top: 0;
+  left: calc(var(--ms-pt-reference-sidebar-width) + 0.28rem);
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ms-pt-reference-sidebar {
+  position: absolute;
+  top: calc(var(--ms-pt-reference-topbar-height) + 0.28rem);
+  left: 0;
+  width: var(--ms-pt-reference-sidebar-width);
+  height: var(--ms-pt-reference-total-height);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ms-pt-reference-topbar-track,
+.ms-pt-reference-sidebar-track {
+  background: var(--ms-pt-reference-bar-background);
+  border-radius: var(--ms-pt-reference-bar-radius);
+  color: var(--ms-pt-reference-bar-foreground);
+}
+
+.ms-pt-reference-topbar-track {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(0, 1fr));
+  column-gap: var(--ms-pt-reference-column-gap);
+  align-items: center;
+  height: var(--ms-pt-reference-topbar-height);
+  padding-inline: 0.03rem;
+}
+
+.ms-pt-reference-sidebar-track {
+  display: grid;
+  grid-template-rows: repeat(7, var(--ms-pt-element-size-spaced)) 1fr;
+  row-gap: var(--ms-pt-reference-row-gap);
+  align-items: center;
+  height: 100%;
+  padding-block: 0.03rem;
+}
+
+.ms-pt-reference-bar-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.ms-pt-reference-table .ms-element-description,
+.ms-pt-reference-table .ms-selectable-table-detail {
+  display: none;
+}
+
+.ms-pt-reference-table .ms-mat-element {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  border-radius: 2px;
+  background: transparent !important;
+  box-shadow: none;
+  color: #20242b;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  text-align: left;
+  transition:
+    box-shadow 120ms ease,
+    color 120ms ease,
+    opacity 120ms ease;
+  filter: none;
+}
+
+.ms-pt-reference-table .ms-mat-element::before {
+  display: none;
+}
+
+.ms-pt-reference-table .ms-mat-element::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--ms-pt-reference-accent-bottom);
+  height: 2px;
+  z-index: 0;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  opacity: 0.92;
+  background: var(--ms-pt-reference-accent, #c8ccd2);
+  transition: height 120ms ease, opacity 120ms ease;
+}
+
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):hover,
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):focus-visible {
+  transform: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
+    var(--ms-pt-reference-accent, #c8ccd2) !important;
+  box-shadow: 0 8px 18px -14px rgba(32, 36, 43, 0.7);
+}
+
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):hover::after,
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):focus-visible::after {
+  height: 4px;
+  opacity: 1;
+}
+
+.ms-pt-reference-table .ms-mat-element.ms-disabled {
+  opacity: 0.5;
+}
+
+.ms-pt-reference-table .ms-mat-element.ms-enabled {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)),
+    var(--ms-pt-reference-accent, #c8ccd2) !important;
+  box-shadow: none;
+  filter: none;
+}
+
+.ms-pt-reference-table .ms-mat-element.ms-enabled:not(.ms-disabled):hover,
+.ms-pt-reference-table .ms-mat-element.ms-enabled:not(.ms-disabled):focus-visible {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)),
+    var(--ms-pt-reference-accent, #c8ccd2) !important;
+  box-shadow: 0 8px 18px -14px rgba(32, 36, 43, 0.7);
+}
+
+.ms-pt-reference-table .ms-mat-element.ms-enabled::after {
+  height: 4px;
+  opacity: 1;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-last-action='deselect'],
+.ms-pt-reference-table .ms-mat-element[data-last-action='deselect']:hover,
+.ms-pt-reference-table .ms-mat-element[data-last-action='deselect']:focus-visible {
+  background: transparent !important;
+  transform: none;
+  box-shadow: none;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-last-action='deselect']::after,
+.ms-pt-reference-table .ms-mat-element[data-last-action='deselect']:hover::after,
+.ms-pt-reference-table .ms-mat-element[data-last-action='deselect']:focus-visible::after {
+  height: 2px;
+  opacity: 0.92;
+}
+
+.ms-pt-reference-table .ms-mat-number {
+  position: absolute;
+  top: 0.16rem;
+  left: 0.16rem;
+  z-index: 1;
+  margin: 0;
+  font-size: var(--ms-pt-reference-number-font-size);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: #7d8794;
+  text-align: left;
+  transition: color 120ms ease;
+}
+
+.ms-pt-reference-table .ms-mat-symbol {
+  position: absolute;
+  top: 1rem;
+  left: 0.16rem;
+  right: 0.14rem;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  font-size: var(--ms-pt-reference-symbol-font-size);
+  font-weight: 700;
+  line-height: 1;
+  color: #171b22;
+  text-rendering: geometricPrecision;
+  white-space: nowrap;
+  text-align: left;
+  transition: color 120ms ease;
+}
+
+.ms-pt-reference-story-shell[data-locale='zh-CN'] .ms-pt-reference-table .ms-mat-name-zh {
+  position: absolute;
+  left: 0.16rem;
+  right: 0.14rem;
+  bottom: var(--ms-pt-reference-name-bottom);
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+  color: #525a66;
+  font-size: var(--ms-pt-reference-name-font-size);
+  font-weight: 500;
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: color 120ms ease;
+}
+
+.ms-pt-reference-story-shell[data-locale='en-US'] .ms-pt-reference-table .ms-mat-name-zh,
+.ms-pt-reference-table .ms-mat-group .ms-mat-name-zh {
+  display: none;
+}
+
+.ms-pt-reference-story-shell[data-locale='en-US'] .ms-pt-reference-table .ms-mat-name-en {
+  position: absolute;
+  left: 0.16rem;
+  right: 0.14rem;
+  bottom: var(--ms-pt-reference-name-bottom);
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+  color: #525a66;
+  font-size: var(--ms-pt-reference-name-font-size);
+  font-weight: 500;
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: color 120ms ease;
+}
+
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):hover .ms-mat-number,
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):focus-visible .ms-mat-number {
+  color: #596270;
+}
+
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):hover .ms-mat-name-zh,
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):hover .ms-mat-name-en,
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):focus-visible .ms-mat-name-zh,
+.ms-pt-reference-table .ms-mat-element:not(.ms-disabled):focus-visible .ms-mat-name-en {
+  color: #434b56;
+}
+
+.ms-pt-reference-story-shell[data-locale='zh-CN'] .ms-pt-reference-table .ms-mat-name-en,
+.ms-pt-reference-table .ms-mat-group .ms-mat-name-en {
+  display: none;
+}
+
+.ms-pt-reference-table .ms-mat-group.ms-mat-element .ms-mat-number {
+  display: block !important;
+  top: var(--ms-pt-reference-group-number-top);
+  left: 0.16rem;
+  font-size: var(--ms-pt-reference-number-font-size);
+  font-weight: 600;
+  color: #8f99a6;
+}
+
+.ms-pt-reference-table .ms-table-container .ms-mat-element.ms-mat-group .ms-mat-symbol {
+  top: var(--ms-pt-reference-group-symbol-top);
+  left: 0.16rem;
+  right: auto;
+  display: block;
+  width: calc(100% - 0.32rem);
+  height: auto;
+  overflow: visible;
+  font-size: 0.98rem !important;
+  font-weight: 700;
+  line-height: 1.04;
+  text-overflow: clip;
+  white-space: nowrap;
+  text-align: left !important;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='1'] {
+  --ms-pt-reference-accent: #c24873;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='2'] {
+  --ms-pt-reference-accent: #43a8d2;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='3'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='4'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='5'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='6'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='7'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='8'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='9'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='10'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='11'],
+.ms-pt-reference-table .ms-mat-element[data-element-group='12'] {
+  --ms-pt-reference-accent: #e78d45;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='13'] {
+  --ms-pt-reference-accent: #cb4d63;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='14'] {
+  --ms-pt-reference-accent: #47a8d3;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='15'] {
+  --ms-pt-reference-accent: #c85c79;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='16'] {
+  --ms-pt-reference-accent: #ca9d33;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='17'] {
+  --ms-pt-reference-accent: #6f9e59;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-group='18'] {
+  --ms-pt-reference-accent: #6a4aa1;
+}
+
+.ms-pt-reference-table .ms-mat-element.ms-element-metal {
+  --ms-pt-reference-accent: #9ea5b0;
+}
+
+.ms-pt-reference-table .ms-mat-element.ms-element-lanthoid,
+.ms-pt-reference-table .ms-mat-element.ms-element-lanthanoid-transitional-metal {
+  --ms-pt-reference-accent: #e88443;
+}
+
+.ms-pt-reference-table .ms-mat-element.ms-element-actinoid,
+.ms-pt-reference-table .ms-mat-element.ms-element-actinoid-transitional-metal {
+  --ms-pt-reference-accent: #6f7c4f;
+}
+
+.ms-pt-reference-table .ms-mat-element[data-element-symbol='H'] {
+  --ms-pt-reference-accent: #ca9d33;
+}
+
+.ms-pt-reference-selection {
+  margin-top: 1rem;
+  color: #4d5560;
+  font-size: 0.9rem;
+}

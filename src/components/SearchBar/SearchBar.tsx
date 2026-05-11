@@ -1,0 +1,36 @@
+import {
+  MaterialsInput,
+  MaterialsInputType,
+  PeriodicTableMode,
+  type MaterialsInputProps,
+} from '../MaterialsInput';
+
+export interface SearchBarProps
+  extends Omit<MaterialsInputProps, 'periodicTableMode' | 'hidePeriodicTable'> {
+  allowedInputTypes?: MaterialsInputType[];
+}
+
+const DEFAULT_ALLOWED_INPUT_TYPES = [
+  MaterialsInputType.FORMULA,
+  MaterialsInputType.ELEMENTS,
+  MaterialsInputType.CHEMICAL_SYSTEM,
+  MaterialsInputType.MPID,
+];
+
+export const SearchBar = ({
+  allowedInputTypes = DEFAULT_ALLOWED_INPUT_TYPES,
+  showTypeDropdown = true,
+  showSubmitButton = true,
+  ...props
+}: SearchBarProps) => {
+  return (
+    <MaterialsInput
+      {...props}
+      allowedInputTypes={allowedInputTypes}
+      showTypeDropdown={showTypeDropdown}
+      showSubmitButton={showSubmitButton}
+      hidePeriodicTable
+      periodicTableMode={PeriodicTableMode.NONE}
+    />
+  );
+};

@@ -1,0 +1,303 @@
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) {
+  box-sizing: border-box;
+  color: var(--ms-color-text-muted, #4a4a4a);
+  font-family: var(--ms-font-family, Helvetica Neue, Arial, sans-serif);
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.5;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) *,
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) *::before,
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) *::after {
+  box-sizing: inherit;
+}
+
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) :where(button, input, select, textarea) {
+  margin: 0;
+  font: inherit;
+}
+
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) :where(a) {
+  color: var(--ms-color-primary, #3273dc);
+  text-decoration: none;
+}
+
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) :where(img, svg) {
+  max-width: 100%;
+}
+
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) :where(p, ul) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) :where(ul) {
+  list-style: none;
+}
+
+:where(.ms-theme, [class^='ms-'], [class*=' ms-']) :where(strong) {
+  color: var(--ms-color-text, #0a0a0a);
+  font-weight: 700;
+}
+
+.ms-box {
+  display: block;
+  padding: 1.25rem;
+  border-radius: var(--ms-border-radius-lg, 6px);
+  background: var(--ms-color-surface, #fff);
+  box-shadow: var(--ms-shadow-surface);
+  color: var(--ms-color-text, #0a0a0a);
+}
+
+.ms-is-small {
+  font-size: 0.75rem;
+}
+
+.ms-is-size-2 {
+  font-size: 1.5rem;
+}
+
+.ms-is-size-7 {
+  font-size: 0.75rem;
+}
+
+.ms-has-text-grey-light {
+  color: #7a7a7a;
+}
+
+.ms-has-text-link {
+  color: var(--ms-color-primary, #3273dc) !important;
+}
+
+.ms-help {
+  display: block;
+  margin-top: 0.25rem;
+  color: #7a7a7a;
+  font-size: 0.875rem;
+}
+
+.ms-button,
+.ms-input {
+  appearance: none;
+  border: 1px solid var(--ms-border-color, #dbdbdb);
+  border-radius: var(--ms-border-radius, 4px);
+  background: var(--ms-color-surface, #fff);
+  color: #363636;
+  line-height: 1.5;
+}
+
+.ms-input {
+  display: inline-flex;
+  width: 100%;
+  min-height: 2.5em;
+  padding: calc(0.5em - 1px) calc(0.75em - 1px);
+  box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.1);
+}
+
+.ms-button {
+  position: relative;
+  display: inline-flex;
+  min-height: 2.5em;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: calc(0.5em - 1px) 1em;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.05);
+}
+
+.ms-input:hover,
+.ms-button:hover {
+  border-color: var(--ms-border-color-hover, #b5b5b5);
+}
+
+.ms-input:focus,
+.ms-input:focus-visible,
+.ms-button:focus-visible {
+  outline: none;
+  border-color: var(--ms-color-primary, #3273dc);
+  box-shadow: 0 0 0 0.125em color-mix(in srgb, var(--ms-color-primary, #3273dc) 25%, transparent);
+}
+
+.ms-button:hover {
+  color: #363636;
+}
+
+.ms-button:disabled,
+.ms-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ms-button.ms-is-primary {
+  border-color: transparent;
+  background: var(--ms-color-primary, #3273dc);
+  color: var(--ms-color-surface, #fff);
+}
+
+.ms-button.ms-is-static {
+  border-color: var(--ms-border-color, #dbdbdb);
+  background: #f5f5f5;
+  box-shadow: none;
+  color: #7a7a7a;
+  pointer-events: none;
+}
+
+.ms-button.ms-is-fullwidth {
+  display: flex;
+  width: 100%;
+}
+
+.ms-is-loading {
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.ms-button.ms-is-loading::after {
+  content: "";
+  position: absolute;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid #dbdbdb;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-radius: 9999px;
+  animation: ms-spin 500ms linear infinite;
+}
+
+.ms-icon {
+  display: inline-flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+svg.lucide {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  vertical-align: -0.125em;
+}
+
+.ms-icon > svg.lucide {
+  display: block;
+}
+
+.ms-field {
+  display: block;
+}
+
+.ms-control {
+  position: relative;
+}
+
+.ms-field.ms-has-addons {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.ms-field.ms-has-addons .ms-control {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.ms-field.ms-has-addons .ms-control.ms-is-expanded {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.ms-field.ms-has-addons .ms-control.ms-is-expanded > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ms-field.ms-has-addons .ms-control:not(:last-child) .ms-button,
+.ms-field.ms-has-addons .ms-control:not(:last-child) .ms-input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.ms-field.ms-has-addons .ms-control:not(:first-child) .ms-button,
+.ms-field.ms-has-addons .ms-control:not(:first-child) .ms-input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 0;
+}
+
+.ms-tag {
+  display: inline-flex;
+  min-height: 2em;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.75em;
+  border: 0;
+  border-radius: var(--ms-border-radius, 4px);
+  background: #f5f5f5;
+  color: #4a4a4a;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.ms-tag:is(a, button) {
+  cursor: pointer;
+}
+
+.ms-tag:is(a, button):hover,
+.ms-tag:is(a, button):focus-visible {
+  text-decoration: underline;
+}
+
+.ms-tag.ms-is-medium {
+  font-size: 1rem;
+}
+
+.ms-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ms-tags .ms-tag {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ms-has-oversized-icon {
+  height: 100% !important;
+  padding: 0 1rem !important;
+}
+
+.ms-is-hidden {
+  display: none !important;
+}
+
+.ms-mr-2 {
+  margin-right: 0.5rem !important;
+}
+
+.ms-mt-3 {
+  margin-top: 0.75rem !important;
+}
+
+@keyframes ms-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}
