@@ -37,11 +37,11 @@ export const PeriodicTableFormulaButtons = ({
       <div className="ms-pt-spacer" />
       {!hideWildcardButton ? (
         <Tooltip
-          place="bottom"
+          place="top"
           trigger={
             <button
               type="button"
-              className="ms-pt-wildcard-button ms-mat-element ms-has-tooltip-bottom"
+              className="ms-pt-wildcard-button ms-mat-element"
               onClick={() => onClick('*')}
               title={resolvedWildcardTitle}
             >

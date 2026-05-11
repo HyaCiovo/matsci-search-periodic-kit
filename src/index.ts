@@ -7,3 +7,4 @@ export * from './components/StandalonePeriodicComponent';
 export * from './components/PeriodicTableModeSwitcher';
 export * from './components/PeriodicTableFormulaButtons';
 export * from './components/TableFilter';
+export * from './components/Tooltip';

@@ -1,8 +1,8 @@
-.ms-formula {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-formula {
   font-weight: 600;
 }
 
-.ms-tooltip {
+.msp-tooltip.ms-tooltip {
   pointer-events: none;
   font-weight: normal;
   text-align: left;
@@ -15,15 +15,17 @@
   animation: ms-tooltip-fade-in 120ms ease-out;
 }
 
-.ms-tooltip[data-border='true'] {
+.msp-tooltip.ms-tooltip[data-border='true'] {
   border: 1px solid #fff;
 }
 
-.ms-tooltip[data-clickable='true'] {
+.msp-tooltip.ms-tooltip[data-clickable='true'] {
   pointer-events: auto;
 }
 
-.ms-tooltip-arrow {
+.msp-tooltip .ms-tooltip-arrow,
+.msp-tooltip.ms-tooltip + .ms-tooltip-arrow,
+.msp-tooltip.ms-tooltip .ms-tooltip-arrow {
   fill: rgba(54, 54, 54, 0.95);
 }
 

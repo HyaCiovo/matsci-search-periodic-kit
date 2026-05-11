@@ -1,6 +1,6 @@
 {
-  "name": "@hyacinth/matsci-search-periodic-kit",
-  "version": "0.1.0",
+  "name": "@gnosys/matsci-search-periodic-kit",
+  "version": "0.0.2",
   "description": "Extracted search bar and periodic table component library from matsci-ui",
   "author": "hyacinth",
   "type": "module",
@@ -24,6 +24,10 @@
       "import": "./dist/periodic-table.js",
       "types": "./dist/periodic-table.d.ts"
     },
+    "./tooltip": {
+      "import": "./dist/tooltip.js",
+      "types": "./dist/tooltip.d.ts"
+    },
     "./composite": {
       "import": "./dist/composite.js",
       "types": "./dist/composite.d.ts"
@@ -42,10 +46,20 @@
   "sideEffects": [
     "**/*.css"
   ],
+  "publishConfig": {
+    "registry": "https://packages.aliyun.com/6549daf63aaed849b035d118/npm/gnosys-release/"
+  },
   "scripts": {
-    "build": "pnpm clean && rollup -c",
+    "build": "node scripts/clean-dist.mjs && rollup -c && node scripts/prepare-style-assets.mjs",
     "build-storybook": "storybook build --disable-telemetry",
+    "check": "npm run typecheck && npm run test && npm run build",
     "clean": "node scripts/clean-dist.mjs",
+    "prepack": "npm run build",
+    "release": "node scripts/release.mjs release",
+    "release:prepare": "node scripts/release.mjs prepare",
+    "release:publish": "node scripts/release.mjs publish",
+    "release:changelog": "node scripts/release.mjs changelog",
+    "release:pack": "npm pack --dry-run --cache ./.npm-cache",
     "storybook": "storybook dev -p 6007 --disable-telemetry --no-open",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",

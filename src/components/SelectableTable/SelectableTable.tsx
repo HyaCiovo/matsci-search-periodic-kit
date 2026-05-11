@@ -188,15 +188,17 @@ function SelectableTableView({
 
   return (
     <div
-      className={clsx('ms-selectable-table', className, {
+      className={clsx('ms-selectable-table', 'msp-root', className, {
         'ms-selectable-table-mini': forceTableLayout === TableLayout.MINI,
       })}
+      data-slot="periodic-table"
       data-table-layout={forceTableLayout}
     >
       <SelectableTableDetailObserver onDetailedElementChange={onDetailedElementChange} />
       <SelectableTableStateObserver onTableStateChange={onTableStateChange} />
       <div
         className={clsx('ms-table-container', layoutClass)}
+        data-slot="periodic-grid"
         onMouseLeave={() => {
           actions.setDetailedElement(null);
         }}

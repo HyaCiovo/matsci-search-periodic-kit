@@ -1,4 +1,4 @@
-:root {
+:where(.msp-theme, .msp-root, .ms-theme) {
   --ms-pt-element-size-spaced: 62px;
   --ms-pt-element-size-compact: 42px;
   --ms-pt-element-size-small: 25px;
@@ -348,7 +348,7 @@
   position: relative;
 }
 
-.ms-table-container .third-span {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-table-container .third-span {
   grid-column: 13 / span 6;
   grid-row: 7 / span 1;
 }
@@ -399,20 +399,20 @@
   padding-bottom: 100%;
 }
 
-.table-legend-container {
+:where(.msp-theme, .msp-root, .ms-theme) .table-legend-container {
   justify-content: center;
   display: flex;
   flex-direction: row;
 }
 
-.table-legend-container .legend-container {
+:where(.msp-theme, .msp-root, .ms-theme) .table-legend-container .legend-container {
   margin-left: 30px;
   display: flex;
   justify-content: center;
   flex-direction: column;
 }
 
-.table-legend-container .legend-container .table-legend {
+:where(.msp-theme, .msp-root, .ms-theme) .table-legend-container .legend-container .table-legend {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -422,19 +422,19 @@
   border: 1px solid #000;
 }
 
-.table-legend-container .legend-container .table-legend .table-legend-pointer {
+:where(.msp-theme, .msp-root, .ms-theme) .table-legend-container .legend-container .table-legend .table-legend-pointer {
   transition: all 100ms;
 }
 
-.table-transition-wrapper-spaced {
+:where(.msp-theme, .msp-root, .ms-theme) .table-transition-wrapper-spaced {
   max-height: 617px;
 }
 
-.table-transition-wrapper-compact {
+:where(.msp-theme, .msp-root, .ms-theme) .table-transition-wrapper-compact {
   max-height: 416px;
 }
 
-.table-transition-wrapper-small {
+:where(.msp-theme, .msp-root, .ms-theme) .table-transition-wrapper-small {
   max-height: 500px;
 }
 

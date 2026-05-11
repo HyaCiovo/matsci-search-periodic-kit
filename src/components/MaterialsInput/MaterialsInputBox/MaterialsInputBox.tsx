@@ -52,6 +52,7 @@ interface MaterialsInputBoxProps {
   periodicTableMode: PeriodicTableMode;
   hasPeriodicTable: boolean;
   showPeriodicTable: boolean;
+  periodicTableDisabled?: boolean;
   onPeriodicToggle: () => void;
   periodicToggleTooltipId: string;
   showPeriodicTableTooltipText?: string;
@@ -100,6 +101,7 @@ export const MaterialsInputBox = ({
   periodicTableMode,
   hasPeriodicTable,
   showPeriodicTable,
+  periodicTableDisabled = false,
   onPeriodicToggle,
   periodicToggleTooltipId,
   showPeriodicTableTooltipText = 'Show Periodic Table',
@@ -291,6 +293,7 @@ export const MaterialsInputBox = ({
               <button
                 data-testid="materials-input-toggle-button"
                 type="button"
+                disabled={periodicTableDisabled}
                 className={clsx(
                   'ms-button ms-has-oversized-icon ms-is-size-2 ms-materials-input-toggle-button',
                   {

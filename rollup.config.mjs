@@ -12,6 +12,7 @@ const entryPoints = {
   index: 'src/index.ts',
   searchbar: 'src/searchbar.ts',
   'periodic-table': 'src/periodic-table.ts',
+  tooltip: 'src/tooltip.ts',
   composite: 'src/composite.ts',
 };
 

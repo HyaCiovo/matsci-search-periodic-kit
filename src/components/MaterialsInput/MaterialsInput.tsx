@@ -39,6 +39,8 @@ import {
   VALID_ELEMENTS,
 } from './utils';
 
+export { TableLayout } from '../SelectableTable';
+
 export enum PeriodicTableMode {
   TOGGLE = 'toggle',
   FOCUS = 'focus',
@@ -69,6 +71,8 @@ export interface MaterialsInputProps extends MaterialsInputSharedProps {
   className?: string;
   debounce?: number;
   periodicTableMode?: PeriodicTableMode;
+  periodicTableLayout?: TableLayout;
+  periodicTableDisabled?: boolean;
   hidePeriodicTable?: boolean;
   showTypeDropdown?: boolean;
   showSubmitButton?: boolean;
@@ -210,6 +214,7 @@ export const MaterialsInput = ({
   maxElementSelectable = 20,
   submitButtonText = 'Search',
   periodicTableMode = PeriodicTableMode.TOGGLE,
+  periodicTableLayout = TableLayout.MINI,
   debounce = 0,
   ...otherProps
 }: MaterialsInputProps) => {
@@ -222,6 +227,7 @@ export const MaterialsInput = ({
     maxElementSelectable,
     submitButtonText,
     periodicTableMode,
+    periodicTableLayout,
     debounce,
     ...otherProps,
   };
@@ -257,6 +263,8 @@ export const MaterialsInput = ({
   const debounceTimeoutRef = useRef<number>();
 
   const hasPeriodicTable = periodicTableMode !== PeriodicTableMode.NONE && !props.hidePeriodicTable;
+  const periodicTableDisabled = Boolean(props.periodicTableDisabled);
+  const effectiveShowPeriodicTable = hasPeriodicTable && !periodicTableDisabled && showPeriodicTable;
   const hasDynamicInputType = props.allowedInputTypes.length > 1;
   const showTypeDropdown = props.showTypeDropdown && hasDynamicInputType;
 
@@ -564,6 +572,12 @@ export const MaterialsInput = ({
   }, [hasPeriodicTable, props.type]);
 
   useEffect(() => {
+    if (periodicTableDisabled && showPeriodicTable) {
+      setShowPeriodicTable(false);
+    }
+  }, [periodicTableDisabled, showPeriodicTable]);
+
+  useEffect(() => {
     const nextSelectedElements = normalizeElementsFromValue(inputType, inputValue);
     setSelectedElements((current) =>
       current.join('|') === nextSelectedElements.join('|') ? current : nextSelectedElements
@@ -593,7 +607,7 @@ export const MaterialsInput = ({
   const disableSubmitButton = !!props.loading || !!error || !inputValue;
 
   return (
-    <div id={props.id} className={clsx('ms-materials-input', props.className)}>
+    <div id={props.id} className={clsx('ms-materials-input', 'msp-root', props.className)} data-slot="search-shell">
       {props.showSubmitButton ? (
         <form data-testid="materials-input-form" onSubmit={(event) => handleSubmit(event)}>
           <MaterialsInputBox
@@ -647,8 +661,13 @@ export const MaterialsInput = ({
             errorTooltipId={errorTooltipId}
             periodicTableMode={periodicTableMode}
             hasPeriodicTable={hasPeriodicTable}
-            showPeriodicTable={showPeriodicTable}
-            onPeriodicToggle={() => setShowPeriodicTable((current) => !current)}
+            showPeriodicTable={effectiveShowPeriodicTable}
+            periodicTableDisabled={periodicTableDisabled}
+            onPeriodicToggle={() => {
+              if (!periodicTableDisabled) {
+                setShowPeriodicTable((current) => !current)
+              }
+            }}
             periodicToggleTooltipId={periodicToggleTooltipId}
             showPeriodicTableTooltipText={resolvedTexts.showPeriodicTableTooltipText}
             hidePeriodicTableTooltipText={resolvedTexts.hidePeriodicTableTooltipText}
@@ -698,7 +717,8 @@ export const MaterialsInput = ({
           errorTooltipId={errorTooltipId}
           periodicTableMode={periodicTableMode}
           hasPeriodicTable={hasPeriodicTable}
-          showPeriodicTable={showPeriodicTable}
+          showPeriodicTable={effectiveShowPeriodicTable}
+          periodicTableDisabled={periodicTableDisabled}
           onPeriodicToggle={() => undefined}
           periodicToggleTooltipId={periodicToggleTooltipId}
           showPeriodicTableTooltipText={resolvedTexts.showPeriodicTableTooltipText}
@@ -713,23 +733,24 @@ export const MaterialsInput = ({
         <div
           data-testid="materials-input-periodic-table"
           className={clsx('ms-materials-input-elements-panel', {
-            'ms-is-hidden': !showPeriodicTable,
-            'ms-mt-3': showPeriodicTable,
+            'ms-is-hidden': !effectiveShowPeriodicTable,
+            'ms-mt-3': effectiveShowPeriodicTable,
           })}
-          aria-hidden={!showPeriodicTable}
+          data-slot="periodic-panel"
+          aria-hidden={!effectiveShowPeriodicTable}
           onMouseDown={() => {
             panelInteractionRef.current = true;
           }}
         >
           <SelectableTable
             className="ms-box"
-            disabled={!showPeriodicTable}
+            disabled={!effectiveShowPeriodicTable}
             enabledElements={selectedElements}
             maxElementSelectable={
               selectionMode === PeriodicTableSelectionMode.ELEMENTS ? 5 : props.maxElementSelectable
             }
             texts={resolvedTexts.selectableTable}
-            forceTableLayout={TableLayout.MINI}
+            forceTableLayout={props.periodicTableLayout}
             hiddenElements={[]}
             onStateChange={handleTableStateChange}
             plugin={

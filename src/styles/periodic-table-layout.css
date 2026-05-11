@@ -1,8 +1,8 @@
-.ms-tabs-nav {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav {
   overflow: visible;
 }
 
-.ms-tabs-nav ul {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav ul {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
@@ -13,11 +13,11 @@
   list-style: none;
 }
 
-.ms-tabs-nav li {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav li {
   display: block;
 }
 
-.ms-tabs-nav li a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav li a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -28,107 +28,107 @@
   text-decoration: none;
 }
 
-.ms-tabs-nav li:not(.ms-is-active) a:hover {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav li:not(.ms-is-active) a:hover {
   border-bottom-color: #363636;
   color: #363636;
 }
 
-.ms-tabs-nav li.ms-is-active a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav li.ms-is-active a {
   border-bottom-color: var(--ms-color-primary, #3273dc);
   color: var(--ms-color-primary, #3273dc);
 }
 
-.ms-tabs-nav.ms-is-centered ul,
-.ms-is-centered.ms-tabs-nav ul {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-centered ul,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-centered.ms-tabs-nav ul {
   justify-content: center;
 }
 
-.ms-tabs-nav.ms-is-toggle ul,
-.ms-is-toggle.ms-tabs-nav ul {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle ul,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-tabs-nav ul {
   border-bottom: 0;
 }
 
-.ms-tabs-nav.ms-is-toggle li a,
-.ms-is-toggle.ms-tabs-nav li a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle li a,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-tabs-nav li a {
   position: relative;
   margin-bottom: 0;
   border: 1px solid #dbdbdb;
 }
 
-.ms-tabs-nav.ms-is-toggle li + li,
-.ms-is-toggle.ms-tabs-nav li + li {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle li + li,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-tabs-nav li + li {
   margin-left: -1px;
 }
 
-.ms-tabs-nav.ms-is-toggle li:first-child a,
-.ms-is-toggle.ms-tabs-nav li:first-child a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle li:first-child a,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-tabs-nav li:first-child a {
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
 }
 
-.ms-tabs-nav.ms-is-toggle li:last-child a,
-.ms-is-toggle.ms-tabs-nav li:last-child a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle li:last-child a,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-tabs-nav li:last-child a {
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 }
 
-.ms-tabs-nav.ms-is-toggle li:not(.ms-is-active) a:hover,
-.ms-is-toggle.ms-tabs-nav li:not(.ms-is-active) a:hover {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle li:not(.ms-is-active) a:hover,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-tabs-nav li:not(.ms-is-active) a:hover {
   z-index: 2;
   border-color: #b5b5b5;
   background: #f5f5f5;
 }
 
-.ms-tabs-nav.ms-is-toggle.ms-is-toggle-rounded li a,
-.ms-is-toggle.ms-is-toggle-rounded.ms-tabs-nav li a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle.ms-is-toggle-rounded li a,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-is-toggle-rounded.ms-tabs-nav li a {
   border-radius: 0;
 }
 
-.ms-tabs-nav.ms-is-toggle.ms-is-toggle-rounded li:first-child a,
-.ms-is-toggle.ms-is-toggle-rounded.ms-tabs-nav li:first-child a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle.ms-is-toggle-rounded li:first-child a,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-is-toggle-rounded.ms-tabs-nav li:first-child a {
   border-top-left-radius: 9999px;
   border-bottom-left-radius: 9999px;
   padding-left: 1.25em;
 }
 
-.ms-tabs-nav.ms-is-toggle.ms-is-toggle-rounded li:last-child a,
-.ms-is-toggle.ms-is-toggle-rounded.ms-tabs-nav li:last-child a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle.ms-is-toggle-rounded li:last-child a,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-is-toggle-rounded.ms-tabs-nav li:last-child a {
   border-top-right-radius: 9999px;
   border-bottom-right-radius: 9999px;
   padding-right: 1.25em;
 }
 
-.ms-tabs-nav.ms-is-toggle li.ms-is-active a,
-.ms-is-toggle.ms-tabs-nav li.ms-is-active a {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-tabs-nav.ms-is-toggle li.ms-is-active a,
+:where(.msp-theme, .msp-root, .ms-theme) .ms-is-toggle.ms-tabs-nav li.ms-is-active a {
   border-color: var(--ms-color-primary, #3273dc);
   background: var(--ms-color-primary, #3273dc);
   color: #fff;
 }
 
-.ms-pt-mode-switcher .ms-dropdown-container {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-pt-mode-switcher .ms-dropdown-container {
   width: 100%;
   text-align: center;
 }
 
-.ms-pt-mode-switcher .ms-dropdown {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-pt-mode-switcher .ms-dropdown {
   text-align: left;
 }
 
-.ms-pt-mode-content {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-pt-mode-content {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: 1fr;
   grid-gap: 2px;
 }
 
-.ms-pt-mode-content .ms-pt-description {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-pt-mode-content .ms-pt-description {
   grid-column: 5 / span 6;
   grid-row: 1 / span 2;
   align-self: start;
   height: 100%;
 }
 
-.ms-pt-mode-content .ms-pt-description > * {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-pt-mode-content .ms-pt-description > * {
   display: block;
   width: 100%;
   height: 100%;
@@ -141,17 +141,17 @@
   background: #fff;
 }
 
-.ms-element-wrapper {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-element-wrapper {
   display: inline-flex;
 }
 
-.ms-element-wrapper .ms-mat-element {
+:where(.msp-theme, .msp-root, .ms-theme) .ms-element-wrapper .ms-mat-element {
   width: 100%;
   height: 100%;
 }
 
 @media screen and (min-width: 769px) and (max-width: 959px) {
-  .ms-pt-mode-switcher-description {
+  :where(.msp-theme, .msp-root, .ms-theme) .ms-pt-mode-switcher-description {
     width: 100%;
     margin-left: 0;
     padding: 0.25rem;
