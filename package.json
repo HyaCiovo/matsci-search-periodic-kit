@@ -1,6 +1,6 @@
 {
   "name": "@gnosys/matsci-search-periodic-kit",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Extracted search bar and periodic table component library from matsci-ui",
   "author": "hyacinth",
   "type": "module",
