@@ -51,6 +51,7 @@ export interface MaterialsInputSharedProps {
   value?: string;
   type?: MaterialsInputType;
   allowedInputTypes?: MaterialsInputType[];
+  materialIdPrefixes?: string[];
   placeholder?: string;
   errorMessage?: string;
   inputClassName?: string;
@@ -210,6 +211,7 @@ export const MaterialsInput = ({
   errorMessage,
   type = MaterialsInputType.ELEMENTS,
   allowedInputTypes = [type],
+  materialIdPrefixes = [],
   onChange = (nextValue) => nextValue,
   maxElementSelectable = 20,
   submitButtonText = 'Search',
@@ -223,6 +225,7 @@ export const MaterialsInput = ({
     type,
     errorMessage: errorMessage ?? 'Invalid input value',
     allowedInputTypes,
+    materialIdPrefixes,
     onChange,
     maxElementSelectable,
     submitButtonText,
@@ -316,6 +319,7 @@ export const MaterialsInput = ({
       props.inputClassName,
       props.label,
       props.loading,
+      props.materialIdPrefixes,
       props.maxElementSelectable,
       props.onChange,
       props.onInputTypeChange,
@@ -347,8 +351,15 @@ export const MaterialsInput = ({
 
   const applyValidatedValue = useCallback(
     (nextValue: string) => {
-      const [detectedType, parsedValue] = detectAndValidateInputType(nextValue, props.allowedInputTypes);
-      const resolvedType = detectedType ?? inputType;
+      const [detectedType, detectedParsedValue] =
+        inputType === MaterialsInputType.MPID
+          ? [null, null]
+          : detectAndValidateInputType(nextValue, props.allowedInputTypes, props.materialIdPrefixes);
+      const fallbackType = props.allowedInputTypes.includes(inputType)
+        ? inputType
+        : props.allowedInputTypes[0] ?? inputType;
+      const resolvedType = detectedType ?? fallbackType;
+      const parsedValue = detectedParsedValue ?? materialsInputTypes[resolvedType]?.validate(nextValue);
       const validLength = validateInputLength(parsedValue, resolvedType, props.maxElementSelectable);
       const isValid = Boolean((parsedValue && validLength) || !nextValue);
       const reachedMax = Array.isArray(parsedValue) && parsedValue.length === props.maxElementSelectable;
@@ -360,8 +371,7 @@ export const MaterialsInput = ({
       }
 
       if (nextValue && (!parsedValue || !validLength)) {
-        // Keep showing what the user typed (e.g. partial mp-id like "mp-"),
-        // but mark as invalid until it becomes a valid value.
+        // Keep showing what the user typed, but mark it as invalid until it becomes a valid value.
         setInputValue(nextValue);
         setError(props.errorMessage);
         return false;
@@ -386,6 +396,7 @@ export const MaterialsInput = ({
       previousValidValue,
       props.allowedInputTypes,
       props.errorMessage,
+      props.materialIdPrefixes,
       props.maxElementSelectable,
       props.onInputTypeChange,
       syncInputState,

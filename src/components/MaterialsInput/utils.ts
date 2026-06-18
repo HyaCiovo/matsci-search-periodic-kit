@@ -176,7 +176,11 @@ export const validateSmiles = (value: string): string | null => {
 };
 
 export const validateMPID = (value: string): string | null => {
-  return value.match(/^(mp|mvc|mol)-\d+/) ? value : null;
+  return value || null;
+};
+
+export const matchesMaterialIdPrefix = (value: string, prefixes: string[] = []): boolean => {
+  return prefixes.some((prefix) => prefix.length > 0 && value.startsWith(prefix));
 };
 
 export const validateInputLength = (
@@ -247,10 +251,22 @@ const sortInputTypes = (a: MaterialsInputType, b: MaterialsInputType) => {
 
 export const detectAndValidateInputType = (
   value: string,
-  allowedInputTypes: MaterialsInputType[]
+  allowedInputTypes: MaterialsInputType[],
+  materialIdPrefixes: string[] = []
 ): [MaterialsInputType | null, any] => {
+  if (
+    allowedInputTypes.includes(MaterialsInputType.MPID) &&
+    matchesMaterialIdPrefix(value, materialIdPrefixes)
+  ) {
+    return [MaterialsInputType.MPID, validateMPID(value)];
+  }
+
   const sortedAllowedInputTypes = [...allowedInputTypes].sort(sortInputTypes);
   for (const inputType of sortedAllowedInputTypes) {
+    if (inputType === MaterialsInputType.MPID) {
+      continue;
+    }
+
     const parsedValue = materialsInputTypes[inputType]?.validate(value);
     if (parsedValue) {
       return [inputType, parsedValue];

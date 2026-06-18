@@ -163,6 +163,119 @@ describe('MaterialsInput', () => {
     });
   });
 
+  it('does not enforce material ID prefixes inside the component', () => {
+    const handleSubmit = vi.fn();
+
+    render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.MPID}
+        allowedInputTypes={[MaterialsInputType.MPID]}
+        showSubmitButton
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByTestId('materials-input-search-input'), {
+      target: { value: 'custom-source-123' },
+    });
+    fireEvent.click(screen.getByTestId('materials-input-submit-button'));
+
+    expect(handleSubmit).toHaveBeenCalledWith(expect.anything(), 'custom-source-123');
+  });
+
+  it('does not auto-detect material ID when other input types are allowed', () => {
+    const handleInputTypeChange = vi.fn();
+
+    render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.ELEMENTS}
+        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+        onInputTypeChange={handleInputTypeChange}
+      />
+    );
+
+    fireEvent.change(screen.getByTestId('materials-input-search-input'), {
+      target: { value: 'Fe' },
+    });
+
+    expect(handleInputTypeChange).not.toHaveBeenCalledWith(MaterialsInputType.MPID);
+    expect(screen.getByTestId('materials-input-search-input')).toHaveValue('Fe');
+  });
+
+  it('does not treat plain text as material ID unless material ID is selected', () => {
+    const handleSubmit = vi.fn();
+
+    render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.ELEMENTS}
+        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByTestId('materials-input-search-input'), {
+      target: { value: 'custom-source-123' },
+    });
+
+    expect(screen.getByTestId('materials-input-submit-button')).toBeDisabled();
+    fireEvent.click(screen.getByTestId('materials-input-submit-button'));
+    expect(handleSubmit).not.toHaveBeenCalled();
+  });
+
+  it('auto-detects material ID only when a configured prefix matches', () => {
+    const handleInputTypeChange = vi.fn();
+    const handleSubmit = vi.fn();
+
+    render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.ELEMENTS}
+        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        materialIdPrefixes={['custom-']}
+        showSubmitButton
+        onInputTypeChange={handleInputTypeChange}
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByTestId('materials-input-search-input'), {
+      target: { value: 'custom-source-123' },
+    });
+    fireEvent.click(screen.getByTestId('materials-input-submit-button'));
+
+    expect(handleInputTypeChange).toHaveBeenCalledWith(MaterialsInputType.MPID);
+    expect(handleSubmit).toHaveBeenCalledWith(expect.anything(), 'custom-source-123');
+  });
+
+  it('keeps material ID input permissive when material ID is explicitly selected', () => {
+    const handleSubmit = vi.fn();
+    const handleInputTypeChange = vi.fn();
+
+    render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.MPID}
+        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+        onInputTypeChange={handleInputTypeChange}
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByTestId('materials-input-search-input'), {
+      target: { value: 'Fe' },
+    });
+    fireEvent.click(screen.getByTestId('materials-input-submit-button'));
+
+    expect(handleInputTypeChange).not.toHaveBeenCalledWith(MaterialsInputType.ELEMENTS);
+    expect(handleSubmit).toHaveBeenCalledWith(expect.anything(), 'Fe');
+  });
+
   it('syncs selection mode formatting when the controlled input type changes', () => {
     const { rerender } = render(
       <MaterialsInput

@@ -65,6 +65,7 @@ export function Example() {
         MaterialsInputType.CHEMICAL_SYSTEM,
         MaterialsInputType.MPID,
       ]}
+      materialIdPrefixes={['mp-', 'mvc-', 'custom-']}
       placeholder="搜索材料"
       showTypeDropdown
       showSubmitButton
@@ -119,6 +120,9 @@ export function PeriodicTableExample() {
 - `MaterialsInputType.SMILES`
 - `MaterialsInputType.MOLECULE_FORMULA`
 - `MaterialsInputType.TEXT`
+
+`materialIdPrefixes` 只用于自动识别并切换到 `MaterialsInputType.MPID`，不会作为
+Material ID 模式本身的输入校验；显式选择 Material ID 后，前缀限制应由宿主侧处理。
 
 常见周期表交互模式：
 
