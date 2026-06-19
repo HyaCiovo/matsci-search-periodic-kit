@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## 0.0.5 - 2026-06-18
+
+Package: `@gnosys/matsci-search-periodic-kit`
+
+- Allow configurable Material ID auto-detection prefixes while keeping Material ID input validation permissive.
+
+
 ## 0.0.4 - 2026-05-13
 
 Package: `@gnosys/matsci-search-periodic-kit`
