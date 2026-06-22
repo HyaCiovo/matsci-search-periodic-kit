@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## 0.0.6 - 2026-06-22
+
+Package: `@gnosys/matsci-search-periodic-kit`
+
+- Rename Material ID input enum from MPID to MID while keeping the public value mId.
+
+
 ## 0.0.5 - 2026-06-18
 
 Package: `@gnosys/matsci-search-periodic-kit`

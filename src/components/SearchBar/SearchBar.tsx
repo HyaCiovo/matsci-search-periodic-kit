@@ -14,7 +14,7 @@ const DEFAULT_ALLOWED_INPUT_TYPES = [
   MaterialsInputType.FORMULA,
   MaterialsInputType.ELEMENTS,
   MaterialsInputType.CHEMICAL_SYSTEM,
-  MaterialsInputType.MPID,
+  MaterialsInputType.MID,
 ];
 
 export const SearchBar = ({

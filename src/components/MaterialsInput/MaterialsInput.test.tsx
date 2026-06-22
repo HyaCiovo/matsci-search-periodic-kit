@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { MaterialsInput, MaterialsInputType, PeriodicTableMode } from './MaterialsInput';
 
 describe('MaterialsInput', () => {
@@ -163,14 +164,63 @@ describe('MaterialsInput', () => {
     });
   });
 
+  it('does not reset the user draft when the parent rerenders with the same controlled value', () => {
+    const props = {
+      value: 'SZL021-CuPd2Sn-91ebd591a32d',
+      type: MaterialsInputType.MID,
+      allowedInputTypes: [MaterialsInputType.MID, MaterialsInputType.ELEMENTS],
+      showSubmitButton: true,
+      debounce: 120,
+    };
+    const { rerender } = render(<MaterialsInput {...props} />);
+
+    const input = screen.getByTestId('materials-input-search-input');
+    fireEvent.change(input, {
+      target: { value: 'SZL021-CuPd2Sn-91ebd591a32d-extra' },
+    });
+
+    expect(input).toHaveValue('SZL021-CuPd2Sn-91ebd591a32d-extra');
+
+    rerender(<MaterialsInput {...props} />);
+
+    expect(input).toHaveValue('SZL021-CuPd2Sn-91ebd591a32d-extra');
+  });
+
+  it('allows a controlled parent to accept clearing the input', async () => {
+    const user = userEvent.setup();
+
+    function ControlledHarness() {
+      const [value, setValue] = useState('SZL021-CuPd2Sn-91ebd591a32d');
+      return (
+        <MaterialsInput
+          value={value}
+          type={MaterialsInputType.MID}
+          allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+          showSubmitButton
+          debounce={0}
+          onChange={setValue}
+        />
+      );
+    }
+
+    render(<ControlledHarness />);
+
+    const input = screen.getByTestId('materials-input-search-input');
+    expect(input).toHaveValue('SZL021-CuPd2Sn-91ebd591a32d');
+
+    await user.clear(input);
+
+    expect(input).toHaveValue('');
+  });
+
   it('does not enforce material ID prefixes inside the component', () => {
     const handleSubmit = vi.fn();
 
     render(
       <MaterialsInput
         value=""
-        type={MaterialsInputType.MPID}
-        allowedInputTypes={[MaterialsInputType.MPID]}
+        type={MaterialsInputType.MID}
+        allowedInputTypes={[MaterialsInputType.MID]}
         showSubmitButton
         onSubmit={handleSubmit}
       />
@@ -191,7 +241,7 @@ describe('MaterialsInput', () => {
       <MaterialsInput
         value=""
         type={MaterialsInputType.ELEMENTS}
-        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
         showSubmitButton
         onInputTypeChange={handleInputTypeChange}
       />
@@ -201,7 +251,7 @@ describe('MaterialsInput', () => {
       target: { value: 'Fe' },
     });
 
-    expect(handleInputTypeChange).not.toHaveBeenCalledWith(MaterialsInputType.MPID);
+    expect(handleInputTypeChange).not.toHaveBeenCalledWith(MaterialsInputType.MID);
     expect(screen.getByTestId('materials-input-search-input')).toHaveValue('Fe');
   });
 
@@ -212,7 +262,7 @@ describe('MaterialsInput', () => {
       <MaterialsInput
         value=""
         type={MaterialsInputType.ELEMENTS}
-        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
         showSubmitButton
         onSubmit={handleSubmit}
       />
@@ -235,7 +285,7 @@ describe('MaterialsInput', () => {
       <MaterialsInput
         value=""
         type={MaterialsInputType.ELEMENTS}
-        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
         materialIdPrefixes={['custom-']}
         showSubmitButton
         onInputTypeChange={handleInputTypeChange}
@@ -248,7 +298,7 @@ describe('MaterialsInput', () => {
     });
     fireEvent.click(screen.getByTestId('materials-input-submit-button'));
 
-    expect(handleInputTypeChange).toHaveBeenCalledWith(MaterialsInputType.MPID);
+    expect(handleInputTypeChange).toHaveBeenCalledWith(MaterialsInputType.MID);
     expect(handleSubmit).toHaveBeenCalledWith(expect.anything(), 'custom-source-123');
   });
 
@@ -259,8 +309,8 @@ describe('MaterialsInput', () => {
     render(
       <MaterialsInput
         value=""
-        type={MaterialsInputType.MPID}
-        allowedInputTypes={[MaterialsInputType.MPID, MaterialsInputType.ELEMENTS]}
+        type={MaterialsInputType.MID}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
         showSubmitButton
         onInputTypeChange={handleInputTypeChange}
         onSubmit={handleSubmit}
@@ -274,6 +324,100 @@ describe('MaterialsInput', () => {
 
     expect(handleInputTypeChange).not.toHaveBeenCalledWith(MaterialsInputType.ELEMENTS);
     expect(handleSubmit).toHaveBeenCalledWith(expect.anything(), 'Fe');
+  });
+
+  it('preserves controlled material ID values when switching to material ID type', () => {
+    const { rerender } = render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.ELEMENTS}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+      />
+    );
+
+    rerender(
+      <MaterialsInput
+        value="SZL045-Ca4H16N8-e7802b2b5d91"
+        type={MaterialsInputType.MID}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+      />
+    );
+
+    expect(screen.getByTestId('materials-input-search-input')).toHaveValue('SZL045-Ca4H16N8-e7802b2b5d91');
+  });
+
+  it('does not report a stale empty value when controlled material ID is hydrated after mount', async () => {
+    const handleChange = vi.fn();
+    const { rerender } = render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.ELEMENTS}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+        debounce={120}
+        showSubmitButton
+        onChange={handleChange}
+      />
+    );
+
+    rerender(
+      <MaterialsInput
+        value="SZL021-CuPd2Sn-91ebd591a32d"
+        type={MaterialsInputType.MID}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+        debounce={120}
+        showSubmitButton
+        onChange={handleChange}
+      />
+    );
+
+    expect(screen.getByTestId('materials-input-search-input')).toHaveValue('SZL021-CuPd2Sn-91ebd591a32d');
+
+    await new Promise((resolve) => window.setTimeout(resolve, 180));
+
+    expect(handleChange).not.toHaveBeenCalledWith('');
+    expect(screen.getByTestId('materials-input-search-input')).toHaveValue('SZL021-CuPd2Sn-91ebd591a32d');
+  });
+
+  it('restores the periodic table after temporarily disabling it for material ID type', () => {
+    const { rerender } = render(
+      <MaterialsInput
+        value="Ca"
+        type={MaterialsInputType.ELEMENTS}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+        periodicTableMode={PeriodicTableMode.TOGGLE}
+      />
+    );
+
+    const periodicTable = screen.getByTestId('materials-input-periodic-table');
+    expect(periodicTable).toHaveAttribute('aria-hidden', 'false');
+
+    rerender(
+      <MaterialsInput
+        value="SZL045-Ca4H16N8-e7802b2b5d91"
+        type={MaterialsInputType.MID}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+        periodicTableMode={PeriodicTableMode.TOGGLE}
+        periodicTableDisabled
+      />
+    );
+
+    expect(periodicTable).toHaveAttribute('aria-hidden', 'true');
+
+    rerender(
+      <MaterialsInput
+        value="Ca"
+        type={MaterialsInputType.ELEMENTS}
+        allowedInputTypes={[MaterialsInputType.MID, MaterialsInputType.ELEMENTS]}
+        showSubmitButton
+        periodicTableMode={PeriodicTableMode.TOGGLE}
+      />
+    );
+
+    expect(periodicTable).toHaveAttribute('aria-hidden', 'false');
   });
 
   it('syncs selection mode formatting when the controlled input type changes', () => {

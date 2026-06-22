@@ -15,7 +15,7 @@ const meta = {
       MaterialsInputType.FORMULA,
       MaterialsInputType.ELEMENTS,
       MaterialsInputType.CHEMICAL_SYSTEM,
-      MaterialsInputType.MPID,
+      MaterialsInputType.MID,
     ],
   },
 } satisfies Meta<typeof SearchBar>;

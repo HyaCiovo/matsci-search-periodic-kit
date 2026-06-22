@@ -4,7 +4,7 @@
 
 它适合以下场景：
 
-- 需要支持化学式、元素列表、化学体系、MPID 等输入方式的材料搜索框
+- 需要支持化学式、元素列表、化学体系、MID 等输入方式的材料搜索框
 - 需要独立可交互的元素周期表
 - 需要“搜索输入 + 周期表选择”组合工作流
 - 需要较轻量、样式边界清晰、便于宿主覆盖的 CSS
@@ -63,7 +63,7 @@ export function Example() {
         MaterialsInputType.FORMULA,
         MaterialsInputType.ELEMENTS,
         MaterialsInputType.CHEMICAL_SYSTEM,
-        MaterialsInputType.MPID,
+        MaterialsInputType.MID,
       ]}
       materialIdPrefixes={['mp-', 'mvc-', 'custom-']}
       placeholder="搜索材料"
@@ -116,12 +116,12 @@ export function PeriodicTableExample() {
 - `MaterialsInputType.FORMULA`
 - `MaterialsInputType.ELEMENTS`
 - `MaterialsInputType.CHEMICAL_SYSTEM`
-- `MaterialsInputType.MPID`
+- `MaterialsInputType.MID`
 - `MaterialsInputType.SMILES`
 - `MaterialsInputType.MOLECULE_FORMULA`
 - `MaterialsInputType.TEXT`
 
-`materialIdPrefixes` 只用于自动识别并切换到 `MaterialsInputType.MPID`，不会作为
+`materialIdPrefixes` 只用于自动识别并切换到 `MaterialsInputType.MID`，不会作为
 Material ID 模式本身的输入校验；显式选择 Material ID 后，前缀限制应由宿主侧处理。
 
 常见周期表交互模式：

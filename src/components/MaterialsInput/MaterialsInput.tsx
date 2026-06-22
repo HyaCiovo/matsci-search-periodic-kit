@@ -156,6 +156,10 @@ const getConvertedValueForInputType = (
   currentInputType: MaterialsInputType,
   currentInputValue: string
 ) => {
+  if (newSelection === MaterialsInputType.MID || currentInputType === MaterialsInputType.MID) {
+    return currentInputValue;
+  }
+
   const { elements, elementsPlusWildcards } = getSelectionTokens(currentInputType, currentInputValue);
 
   if (newSelection === MaterialsInputType.CHEMICAL_SYSTEM) {
@@ -352,7 +356,7 @@ export const MaterialsInput = ({
   const applyValidatedValue = useCallback(
     (nextValue: string) => {
       const [detectedType, detectedParsedValue] =
-        inputType === MaterialsInputType.MPID
+        inputType === MaterialsInputType.MID
           ? [null, null]
           : detectAndValidateInputType(nextValue, props.allowedInputTypes, props.materialIdPrefixes);
       const fallbackType = props.allowedInputTypes.includes(inputType)
@@ -404,6 +408,10 @@ export const MaterialsInput = ({
   );
 
   const lastReportedValue = useRef(props.value);
+  const lastPropsValue = useRef(props.value);
+  const didSyncInitialControlledValue = useRef(false);
+  const latestInputValueRef = useRef(inputValue);
+  latestInputValueRef.current = inputValue;
 
   const reportChange = useCallback((valueToReport: string) => {
     lastReportedValue.current = valueToReport;
@@ -422,6 +430,12 @@ export const MaterialsInput = ({
       setSelectedElements([]);
       setShowAutocomplete(false);
       setShowInputHelp(Boolean(props.helpItems));
+      lastReportedValue.current = '';
+      callbackPropsRef.current.onChange('');
+      callbackPropsRef.current.onPropsChange?.({
+        ...callbackPropsRef.current,
+        value: '',
+      });
       return;
     }
 
@@ -540,9 +554,14 @@ export const MaterialsInput = ({
 
   useEffect(() => {
     window.clearTimeout(debounceTimeoutRef.current);
+    const valueToReport = inputValue;
     debounceTimeoutRef.current = window.setTimeout(() => {
-      if (!error && inputValue !== lastReportedValue.current) {
-        reportChange(inputValue);
+      if (
+        !error &&
+        valueToReport === latestInputValueRef.current &&
+        valueToReport !== lastReportedValue.current
+      ) {
+        reportChange(valueToReport);
       }
     }, callbackProps.debounce);
 
@@ -557,13 +576,20 @@ export const MaterialsInput = ({
   }, [submitButtonClicks]);
 
   useEffect(() => {
-    if (props.value !== lastReportedValue.current) {
-      setInputValue(props.value);
-      setPreviousValidValue(props.value);
-      setMaxElementsReached(isMaxSelectionValue(props.type, props.value, props.maxElementSelectable));
+    if (!didSyncInitialControlledValue.current) {
+      didSyncInitialControlledValue.current = true;
+      lastPropsValue.current = props.value;
+      syncInputState(props.value, props.type);
+      lastReportedValue.current = props.value;
+      return;
+    }
+
+    if (props.value !== lastPropsValue.current) {
+      lastPropsValue.current = props.value;
+      syncInputState(props.value, props.type);
       lastReportedValue.current = props.value;
     }
-  }, [props.maxElementSelectable, props.type, props.value]);
+  }, [props.type, props.value, syncInputState]);
 
   useEffect(() => {
     const previousInputType = inputType;
@@ -581,12 +607,6 @@ export const MaterialsInput = ({
       }
     }
   }, [hasPeriodicTable, props.type]);
-
-  useEffect(() => {
-    if (periodicTableDisabled && showPeriodicTable) {
-      setShowPeriodicTable(false);
-    }
-  }, [periodicTableDisabled, showPeriodicTable]);
 
   useEffect(() => {
     const nextSelectedElements = normalizeElementsFromValue(inputType, inputValue);

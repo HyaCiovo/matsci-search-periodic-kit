@@ -16,7 +16,7 @@ const meta = {
       MaterialsInputType.FORMULA,
       MaterialsInputType.ELEMENTS,
       MaterialsInputType.CHEMICAL_SYSTEM,
-      MaterialsInputType.MPID,
+      MaterialsInputType.MID,
     ],
     elementsSelectHelpText: 'Select elements to require at least these species.',
     chemicalSystemSelectHelpText: 'Select elements to restrict the chemical system.',

@@ -2,7 +2,7 @@ export enum MaterialsInputType {
   ELEMENTS = 'elements',
   CHEMICAL_SYSTEM = 'chemical_system',
   FORMULA = 'formula',
-  MPID = 'mpid',
+  MID = 'mId',
   SMILES = 'smiles',
   TEXT = 'text',
   MOLECULE_FORMULA = 'molecule_formula',
@@ -175,7 +175,7 @@ export const validateSmiles = (value: string): string | null => {
   return Array.isArray(result) ? value : null;
 };
 
-export const validateMPID = (value: string): string | null => {
+export const validateMID = (value: string): string | null => {
   return value || null;
 };
 
@@ -201,42 +201,42 @@ export const validateInputLength = (
 export type MaterialsInputTypesMap = Partial<Record<MaterialsInputType, any>>;
 
 export const materialsInputTypes: MaterialsInputTypesMap = {
-  mpid: {
-    validate: validateMPID,
+  [MaterialsInputType.MID]: {
+    validate: validateMID,
     order: 1,
     dropdownValue: 'Material ID',
   },
-  formula: {
+  [MaterialsInputType.FORMULA]: {
     validate: validateFormula,
     order: 2,
     selectionMode: PeriodicTableSelectionMode.FORMULA,
     dropdownValue: 'Formula',
   },
-  chemical_system: {
+  [MaterialsInputType.CHEMICAL_SYSTEM]: {
     validate: validateChemicalSystem,
     order: 3,
     selectionMode: PeriodicTableSelectionMode.CHEMICAL_SYSTEM,
     dropdownValue: 'Chemical System',
     elementsOnlyDropdownValue: 'Only',
   },
-  elements: {
+  [MaterialsInputType.ELEMENTS]: {
     validate: validateElementsList,
     order: 4,
     selectionMode: PeriodicTableSelectionMode.ELEMENTS,
     dropdownValue: 'Elements',
     elementsOnlyDropdownValue: 'At least',
   },
-  molecule_formula: {
+  [MaterialsInputType.MOLECULE_FORMULA]: {
     validate: validateMoleculeFormula,
     order: 5,
     dropdownValue: 'Molecule Formula',
   },
-  smiles: {
+  [MaterialsInputType.SMILES]: {
     validate: validateSmiles,
     order: 6,
     dropdownValue: 'SMILES',
   },
-  text: {
+  [MaterialsInputType.TEXT]: {
     validate: () => true,
     order: 7,
     dropdownValue: 'Text',
@@ -255,15 +255,15 @@ export const detectAndValidateInputType = (
   materialIdPrefixes: string[] = []
 ): [MaterialsInputType | null, any] => {
   if (
-    allowedInputTypes.includes(MaterialsInputType.MPID) &&
+    allowedInputTypes.includes(MaterialsInputType.MID) &&
     matchesMaterialIdPrefix(value, materialIdPrefixes)
   ) {
-    return [MaterialsInputType.MPID, validateMPID(value)];
+    return [MaterialsInputType.MID, validateMID(value)];
   }
 
   const sortedAllowedInputTypes = [...allowedInputTypes].sort(sortInputTypes);
   for (const inputType of sortedAllowedInputTypes) {
-    if (inputType === MaterialsInputType.MPID) {
+    if (inputType === MaterialsInputType.MID) {
       continue;
     }
 
