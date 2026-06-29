@@ -2,6 +2,26 @@
 
 `@gnosys/matsci-search-periodic-kit` 是从 `matsci-ui` 中抽离出来的搜索栏与元素周期表组件包。
 
+## GitHub Overview
+
+`matsci-search-periodic-kit` is a reusable search bar and periodic table toolkit for materials search workflows. It is designed for host applications that need formula, element, chemical system, or material ID input together with an interactive periodic table.
+
+If this project is useful to you, welcome to star the repository and open pull requests. Contributions for bug fixes, docs, and especially internationalization support are welcome.
+
+## Package Availability
+
+This package is currently not published to the public npm registry. It is only used inside our team's private registry and internal projects for now.
+
+If you want to use it outside our internal environment, you need to build and pack it locally first, then consume the generated tarball in your own project.
+
+Typical local packaging flow:
+
+```bash
+pnpm install
+pnpm build
+pnpm pack
+```
+
 它适合以下场景：
 
 - 需要支持化学式、元素列表、化学体系、MID 等输入方式的材料搜索框
@@ -10,6 +30,9 @@
 - 需要较轻量、样式边界清晰、便于宿主覆盖的 CSS
 
 ## 安装
+
+如果你已经接入团队内部私有 registry，可以按下面的包名安装。  
+如果没有接入，需要先在本地自行打包后再使用。
 
 ```bash
 pnpm add @gnosys/matsci-search-periodic-kit
@@ -234,3 +257,17 @@ pnpm release minor --notes-file ./release-notes.md
 - 运行 `typecheck`、`test`、`build`
 - 将当前版本发布到配置好的 `@gnosys` registry
 - 使用包目录内的本地 npm cache，避免全局 cache 权限问题
+
+## Contributing
+
+欢迎提交 issue 和 PR。
+
+适合直接贡献的方向包括：
+
+- bug 修复
+- 文档改进
+- 示例补充
+- 交互与可访问性优化
+- 国际化与多语言支持
+
+如果你计划引入较大的行为变更，建议先在 issue 里说明目标、约束和兼容性影响。
