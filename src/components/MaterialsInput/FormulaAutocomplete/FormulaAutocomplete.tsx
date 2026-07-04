@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { type RefObject, useEffect, useRef, useState } from 'react';
 import { Formula } from '../../Formula';
-import { MaterialsInputType, validateFormula } from '../utils';
+import { MaterialsInputType, type MaterialsInputTypeId, validateFormula } from '../utils';
 import { fetchJson } from '../../../utils/http';
 import { AnchoredPopover } from '../../../internal/AnchoredPopover';
 
@@ -12,7 +12,7 @@ interface FormulaSuggestion {
 interface Props {
   anchorRef: RefObject<HTMLElement | null>;
   value: string;
-  inputType?: MaterialsInputType | null;
+  inputType?: MaterialsInputTypeId | null;
   apiEndpoint: string;
   apiKey?: string;
   show?: boolean;

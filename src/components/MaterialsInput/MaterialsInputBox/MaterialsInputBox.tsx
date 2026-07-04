@@ -4,7 +4,7 @@ import { CircleHelp, Keyboard, TriangleAlert } from 'lucide-react';
 import { Tooltip } from '../../Tooltip';
 import { FormulaAutocomplete } from '../FormulaAutocomplete';
 import { InputHelp, type InputHelpItem } from '../InputHelp';
-import type { MaterialsInputType } from '../utils';
+import type { MaterialsInputTypeId } from '../utils';
 import type { PeriodicTableMode } from '../MaterialsInput';
 import { Dropdown } from '../../Dropdown';
 import { Input } from '../../Input';
@@ -22,7 +22,7 @@ interface MaterialsInputBoxProps {
   onTypeChange: (value: string) => void;
   inputRef: MutableRefObject<HTMLInputElement | null>;
   inputValue: string;
-  inputType: MaterialsInputType;
+  inputType: MaterialsInputTypeId;
   inputClassName?: string;
   placeholder?: string;
   periodicTableToggleIcon?: ReactNode;

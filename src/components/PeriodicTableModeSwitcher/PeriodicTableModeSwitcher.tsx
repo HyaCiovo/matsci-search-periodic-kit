@@ -2,12 +2,20 @@ import clsx from 'clsx';
 import { Asterisk } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { PeriodicTableFormulaButtons } from '../PeriodicTableFormulaButtons';
-import { PeriodicTableSelectionMode } from '../MaterialsInput/utils';
+import { PeriodicTableSelectionMode, type MaterialsInputTypeId } from '../MaterialsInput/utils';
 import { mergeTexts } from '../../utils/text';
+
+interface InputTypeSwitchItem {
+  id: MaterialsInputTypeId;
+  label: string;
+  mode: PeriodicTableSelectionMode;
+}
 
 interface Props {
   mode: PeriodicTableSelectionMode;
   allowedModes?: PeriodicTableSelectionMode[];
+  activeInputType?: MaterialsInputTypeId;
+  inputTypeSwitchItems?: InputTypeSwitchItem[];
   hideWildcardButton?: boolean;
   chemicalSystemSelectHelpText?: string;
   elementsSelectHelpText?: string;
@@ -16,6 +24,7 @@ interface Props {
   wildcardTooltip?: string;
   texts?: Partial<PeriodicTableModeSwitcherTexts>;
   onSwitch: (mode: PeriodicTableSelectionMode) => void;
+  onInputTypeSwitch?: (item: InputTypeSwitchItem) => void;
   onFormulaButtonClick: (value: string) => void;
 }
 
@@ -53,16 +62,31 @@ export const PeriodicTableModeSwitcher = ({
   const resolvedModeLabels = { ...resolvedTexts.modeLabels, ...(modeLabels ?? {}) };
   const resolvedWildcardTitle = wildcardTitle ?? resolvedTexts.wildcardTitle;
   const resolvedWildcardTooltip = wildcardTooltip ?? texts?.wildcardTooltip ?? resolvedWildcardTitle;
+  const tabItems =
+    props.inputTypeSwitchItems && props.inputTypeSwitchItems.length > 0
+      ? props.inputTypeSwitchItems.map((item) => ({
+          key: item.id,
+          label: item.label,
+          active: item.id === props.activeInputType,
+          onClick: () => props.onInputTypeSwitch?.(item),
+        }))
+      : allowedModes.map((mode) => ({
+          key: mode,
+          label: resolvedModeLabels[mode],
+          active: mode === props.mode,
+          onClick: () => props.onSwitch(mode),
+        }));
+
   return (
     <>
       <div data-testid="ms-pt-mode-switcher" className="ms-pt-mode-switcher ms-first-span">
         <div className="ms-dropdown-container">
           <div className="ms-tabs-nav ms-is-small ms-is-toggle ms-is-toggle-rounded ms-is-centered">
             <ul>
-              {allowedModes.map((mode) => (
-                <li key={mode} className={clsx({ 'ms-is-active': mode === props.mode })}>
-                  <a onClick={() => props.onSwitch(mode)}>
-                    <span>{resolvedModeLabels[mode]}</span>
+              {tabItems.map((item) => (
+                <li key={item.key} className={clsx({ 'ms-is-active': item.active })}>
+                  <a onClick={item.onClick}>
+                    <span>{item.label}</span>
                   </a>
                 </li>
               ))}

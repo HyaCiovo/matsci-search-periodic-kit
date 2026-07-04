@@ -2,12 +2,13 @@ import {
   MaterialsInput,
   MaterialsInputType,
   PeriodicTableMode,
+  type MaterialsInputTypeId,
   type MaterialsInputProps,
 } from '../MaterialsInput';
 
 export interface SearchBarProps
   extends Omit<MaterialsInputProps, 'periodicTableMode' | 'hidePeriodicTable'> {
-  allowedInputTypes?: MaterialsInputType[];
+  allowedInputTypes?: MaterialsInputTypeId[];
 }
 
 const DEFAULT_ALLOWED_INPUT_TYPES = [

@@ -33,8 +33,13 @@ import {
   getMaterialsInputTypeByMappedValue,
   materialsInputTypes,
   MaterialsInputType,
+  type MaterialsInputTypeId,
+  type MaterialsInputTypeOption,
+  type MaterialsInputTypesMap,
   PeriodicTableSelectionMode,
   pluralize,
+  resolveMaterialsInputTypes,
+  validateChemicalSystem,
   validateInputLength,
   VALID_ELEMENTS,
 } from './utils';
@@ -49,8 +54,10 @@ export enum PeriodicTableMode {
 
 export interface MaterialsInputSharedProps {
   value?: string;
-  type?: MaterialsInputType;
-  allowedInputTypes?: MaterialsInputType[];
+  type?: MaterialsInputTypeId;
+  allowedInputTypes?: MaterialsInputTypeId[];
+  allowedInputTypeIds?: MaterialsInputTypeId[];
+  inputTypeOptions?: MaterialsInputTypeOption[];
   materialIdPrefixes?: string[];
   placeholder?: string;
   errorMessage?: string;
@@ -62,7 +69,7 @@ export interface MaterialsInputSharedProps {
   maxElementSelectable?: number;
   texts?: Partial<MaterialsInputTexts>;
   onChange?: (value: string) => any;
-  onInputTypeChange?: (type: MaterialsInputType) => any;
+  onInputTypeChange?: (type: MaterialsInputTypeId) => any;
   onSubmit?: (event: FormEvent | MouseEvent, value?: string, filterProps?: any) => any;
 }
 
@@ -87,18 +94,19 @@ export interface MaterialsInputProps extends MaterialsInputSharedProps {
   onPropsChange?: (propsObject: any) => void;
 }
 
-const normalizeElementsFromValue = (type: MaterialsInputType | null, value: string): string[] => {
+const EMPTY_INPUT_TYPE_OPTIONS: MaterialsInputTypeOption[] = [];
+
+const normalizeElementsFromValue = (
+  type: MaterialsInputTypeId | null,
+  value: string,
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes
+): string[] => {
   if (!value) {
     return [];
   }
 
-  if (
-    type === MaterialsInputType.CHEMICAL_SYSTEM ||
-    type === MaterialsInputType.ELEMENTS ||
-    type === MaterialsInputType.FORMULA ||
-    type === MaterialsInputType.MOLECULE_FORMULA
-  ) {
-    const parsedValue = materialsInputTypes[type]?.validate(value);
+  if (type && inputTypes[type]?.selectionMode) {
+    const parsedValue = inputTypes[type]?.validate(value);
     return Array.isArray(parsedValue) ? parsedValue : [];
   }
 
@@ -126,20 +134,25 @@ const renderPeriodicTableValue = (mode: PeriodicTableSelectionMode, elements: st
 };
 
 const isMaxSelectionValue = (
-  type: MaterialsInputType | null,
+  type: MaterialsInputTypeId | null,
   value: string,
-  maxElementSelectable: number
+  maxElementSelectable: number,
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes
 ) => {
   if (!type || !value) {
     return false;
   }
 
-  const parsedValue = materialsInputTypes[type]?.validate(value);
+  const parsedValue = inputTypes[type]?.validate(value);
   return Array.isArray(parsedValue) && parsedValue.length === maxElementSelectable;
 };
 
-const getSelectionTokens = (type: MaterialsInputType, value: string) => {
-  const parsedValue = materialsInputTypes[type]?.validate(value);
+const getSelectionTokens = (
+  type: MaterialsInputTypeId,
+  value: string,
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes
+) => {
+  const parsedValue = inputTypes[type]?.validate(value);
   const elements = Array.isArray(parsedValue) ? parsedValue : [];
   const wildcards = value.match(/\*/g) ?? [];
   return {
@@ -152,31 +165,37 @@ const areElementListsEqual = (left: string[], right: string[]) =>
   left.length === right.length && left.every((value, index) => value === right[index]);
 
 const getConvertedValueForInputType = (
-  newSelection: MaterialsInputType,
-  currentInputType: MaterialsInputType,
-  currentInputValue: string
+  newSelection: MaterialsInputTypeId,
+  currentInputType: MaterialsInputTypeId,
+  currentInputValue: string,
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes
 ) => {
-  if (newSelection === MaterialsInputType.MID || currentInputType === MaterialsInputType.MID) {
+  if (inputTypes[newSelection]?.isMaterialId || inputTypes[currentInputType]?.isMaterialId) {
     return currentInputValue;
   }
 
-  const { elements, elementsPlusWildcards } = getSelectionTokens(currentInputType, currentInputValue);
+  const { elements, elementsPlusWildcards } = getSelectionTokens(currentInputType, currentInputValue, inputTypes);
+  const nextSelectionMode = inputTypes[newSelection]?.selectionMode;
+  const currentSelectionMode = inputTypes[currentInputType]?.selectionMode;
 
-  if (newSelection === MaterialsInputType.CHEMICAL_SYSTEM) {
+  if (nextSelectionMode === PeriodicTableSelectionMode.CHEMICAL_SYSTEM) {
     if (elementsPlusWildcards.length > 1) {
       return arrayToDelimitedString(elementsPlusWildcards, /-/);
     }
     return currentInputValue;
   }
 
-  if (newSelection === MaterialsInputType.ELEMENTS) {
+  if (nextSelectionMode === PeriodicTableSelectionMode.ELEMENTS) {
     if (elements.length > 1) {
       return arrayToDelimitedString(elements, /,/);
     }
     return currentInputValue;
   }
 
-  if (newSelection === MaterialsInputType.FORMULA && currentInputType !== MaterialsInputType.FORMULA) {
+  if (
+    nextSelectionMode === PeriodicTableSelectionMode.FORMULA &&
+    currentSelectionMode !== PeriodicTableSelectionMode.FORMULA
+  ) {
     if (elements.length > 1) {
       return elements.join('');
     }
@@ -214,7 +233,9 @@ export const MaterialsInput = ({
   value = '',
   errorMessage,
   type = MaterialsInputType.ELEMENTS,
-  allowedInputTypes = [type],
+  allowedInputTypes,
+  allowedInputTypeIds,
+  inputTypeOptions,
   materialIdPrefixes = [],
   onChange = (nextValue) => nextValue,
   maxElementSelectable = 20,
@@ -224,11 +245,16 @@ export const MaterialsInput = ({
   debounce = 0,
   ...otherProps
 }: MaterialsInputProps) => {
+  const resolvedInputTypeOptions = inputTypeOptions ?? EMPTY_INPUT_TYPE_OPTIONS;
+  const inputTypes = useMemo(() => resolveMaterialsInputTypes(resolvedInputTypeOptions), [resolvedInputTypeOptions]);
+  const normalizedAllowedInputTypes = allowedInputTypeIds ?? allowedInputTypes ?? [type];
   const props = {
     value,
     type,
     errorMessage: errorMessage ?? 'Invalid input value',
-    allowedInputTypes,
+    allowedInputTypes: normalizedAllowedInputTypes,
+    allowedInputTypeIds,
+    inputTypeOptions: resolvedInputTypeOptions,
     materialIdPrefixes,
     onChange,
     maxElementSelectable,
@@ -241,7 +267,7 @@ export const MaterialsInput = ({
   const resolvedTexts = mergeTexts(DEFAULT_TEXTS, props.texts);
 
   const [inputValue, setInputValue] = useState(props.value);
-  const [inputType, setInputType] = useState<MaterialsInputType>(props.type);
+  const [inputType, setInputType] = useState<MaterialsInputTypeId>(props.type);
   const [error, setError] = useState<string | null>(null);
   const [errorTipStayActive, setErrorTipStayActive] = useState(false);
   const [showInputHelp, setShowInputHelp] = useState(false);
@@ -250,13 +276,13 @@ export const MaterialsInput = ({
   const [isFocused, setIsFocused] = useState(false);
   const [previousValidValue, setPreviousValidValue] = useState(props.value);
   const [maxElementsReached, setMaxElementsReached] = useState(() =>
-    isMaxSelectionValue(props.type, props.value, props.maxElementSelectable)
+    isMaxSelectionValue(props.type, props.value, props.maxElementSelectable, inputTypes)
   );
   const [showPeriodicTable, setShowPeriodicTable] = useState(
     periodicTableMode === PeriodicTableMode.TOGGLE && !props.hidePeriodicTable
   );
   const [selectionMode, setSelectionMode] = useState<PeriodicTableSelectionMode>(
-    materialsInputTypes[inputType]?.selectionMode ?? PeriodicTableSelectionMode.ELEMENTS
+    inputTypes[inputType]?.selectionMode ?? PeriodicTableSelectionMode.ELEMENTS
   );
   const [selectedElements, setSelectedElements] = useState<string[]>(() =>
     normalizeElementsFromValue(type, value)
@@ -274,31 +300,52 @@ export const MaterialsInput = ({
   const effectiveShowPeriodicTable = hasPeriodicTable && !periodicTableDisabled && showPeriodicTable;
   const hasDynamicInputType = props.allowedInputTypes.length > 1;
   const showTypeDropdown = props.showTypeDropdown && hasDynamicInputType;
+  const allowedInputTypeOptions = props.allowedInputTypes
+    .map((candidate) => inputTypes[candidate])
+    .filter((candidate): candidate is MaterialsInputTypeOption => Boolean(candidate));
 
   const dropdownOnlyElementsOrChemSys =
     showTypeDropdown &&
     props.allowedInputTypes.length === 2 &&
     props.allowedInputTypes.every((candidate) =>
-      [MaterialsInputType.ELEMENTS, MaterialsInputType.CHEMICAL_SYSTEM].includes(candidate)
+      candidate === MaterialsInputType.ELEMENTS || candidate === MaterialsInputType.CHEMICAL_SYSTEM
     );
 
   const typeDropdownOptions = showTypeDropdown
     ? dropdownOnlyElementsOrChemSys
       ? [
-          materialsInputTypes[MaterialsInputType.CHEMICAL_SYSTEM]?.elementsOnlyDropdownValue,
-          materialsInputTypes[MaterialsInputType.ELEMENTS]?.elementsOnlyDropdownValue,
-        ].filter(Boolean)
-      : props.allowedInputTypes.map((candidate) => materialsInputTypes[candidate]?.dropdownValue)
+          inputTypes[MaterialsInputType.CHEMICAL_SYSTEM]?.elementsOnlyDropdownValue,
+          inputTypes[MaterialsInputType.ELEMENTS]?.elementsOnlyDropdownValue,
+        ].filter((value): value is string => Boolean(value))
+      : allowedInputTypeOptions.map((candidate) => candidate.dropdownValue)
     : [];
 
   const typeDropdownValue = dropdownOnlyElementsOrChemSys
-    ? materialsInputTypes[inputType]?.elementsOnlyDropdownValue
-    : materialsInputTypes[inputType]?.dropdownValue;
+    ? inputTypes[inputType]?.elementsOnlyDropdownValue
+    : inputTypes[inputType]?.dropdownValue;
 
   const allowedSelectionModes = useMemo(
-    () => getAllowedSelectionModes(props.allowedInputTypes as MaterialsInputType[]),
-    [props.allowedInputTypes]
+    () => getAllowedSelectionModes(props.allowedInputTypes, inputTypes),
+    [props.allowedInputTypes, inputTypes]
   );
+  const periodicTableInputTypeSwitchItems = useMemo(() => {
+    const selectableOptions = props.allowedInputTypes
+      .map((candidate) => inputTypes[candidate])
+      .filter(
+        (candidate): candidate is MaterialsInputTypeOption & { selectionMode: PeriodicTableSelectionMode } =>
+          Boolean(candidate?.selectionMode)
+      );
+
+    if (selectableOptions.length <= allowedSelectionModes.length) {
+      return undefined;
+    }
+
+    return selectableOptions.map((candidate) => ({
+      id: candidate.id,
+      label: candidate.elementsOnlyDropdownValue ?? candidate.dropdownValue,
+      mode: candidate.selectionMode,
+    }));
+  }, [allowedSelectionModes.length, inputTypes, props.allowedInputTypes]);
   const callbackProps = useMemo(
     () => ({
       ...props,
@@ -308,6 +355,7 @@ export const MaterialsInput = ({
     [
       inputType,
       inputValue,
+      props.allowedInputTypeIds,
       props.allowedInputTypes,
       props.autocompleteApiKey,
       props.autocompleteFormulaUrl,
@@ -321,6 +369,7 @@ export const MaterialsInput = ({
       props.hideWildcardButton,
       props.id,
       props.inputClassName,
+      props.inputTypeOptions,
       props.label,
       props.loading,
       props.materialIdPrefixes,
@@ -343,28 +392,28 @@ export const MaterialsInput = ({
   );
 
   const syncInputState = useCallback(
-    (nextValue: string, nextType: MaterialsInputType = inputType) => {
+    (nextValue: string, nextType: MaterialsInputTypeId = inputType) => {
       setError(null);
       setInputValue(nextValue);
-      setSelectedElements(normalizeElementsFromValue(nextType, nextValue));
+      setSelectedElements(normalizeElementsFromValue(nextType, nextValue, inputTypes));
       setPreviousValidValue(nextValue);
-      setMaxElementsReached(isMaxSelectionValue(nextType, nextValue, props.maxElementSelectable));
+      setMaxElementsReached(isMaxSelectionValue(nextType, nextValue, props.maxElementSelectable, inputTypes));
     },
-    [inputType, props.maxElementSelectable]
+    [inputType, inputTypes, props.maxElementSelectable]
   );
 
   const applyValidatedValue = useCallback(
     (nextValue: string) => {
       const [detectedType, detectedParsedValue] =
-        inputType === MaterialsInputType.MID
+        inputTypes[inputType]?.isMaterialId
           ? [null, null]
-          : detectAndValidateInputType(nextValue, props.allowedInputTypes, props.materialIdPrefixes);
+          : detectAndValidateInputType(nextValue, props.allowedInputTypes, props.materialIdPrefixes, inputTypes);
       const fallbackType = props.allowedInputTypes.includes(inputType)
         ? inputType
         : props.allowedInputTypes[0] ?? inputType;
       const resolvedType = detectedType ?? fallbackType;
-      const parsedValue = detectedParsedValue ?? materialsInputTypes[resolvedType]?.validate(nextValue);
-      const validLength = validateInputLength(parsedValue, resolvedType, props.maxElementSelectable);
+      const parsedValue = detectedParsedValue ?? inputTypes[resolvedType]?.validate(nextValue);
+      const validLength = validateInputLength(parsedValue, resolvedType, props.maxElementSelectable, inputTypes);
       const isValid = Boolean((parsedValue && validLength) || !nextValue);
       const reachedMax = Array.isArray(parsedValue) && parsedValue.length === props.maxElementSelectable;
 
@@ -384,7 +433,7 @@ export const MaterialsInput = ({
       if (detectedType) {
         setInputType(detectedType);
         props.onInputTypeChange?.(detectedType);
-        const nextSelectionMode = materialsInputTypes[detectedType]?.selectionMode;
+        const nextSelectionMode = inputTypes[detectedType]?.selectionMode;
         if (nextSelectionMode) {
           setSelectionMode(nextSelectionMode);
         }
@@ -400,6 +449,7 @@ export const MaterialsInput = ({
       previousValidValue,
       props.allowedInputTypes,
       props.errorMessage,
+      inputTypes,
       props.materialIdPrefixes,
       props.maxElementSelectable,
       props.onInputTypeChange,
@@ -471,10 +521,15 @@ export const MaterialsInput = ({
   const convertSelectionToInputType = (
     selectedValue: string | undefined,
     lookupKey: string,
-    currentInputType: MaterialsInputType,
+    currentInputType: MaterialsInputTypeId,
     currentInputValue: string
   ) => {
-    const newSelection = getMaterialsInputTypeByMappedValue(lookupKey, selectedValue);
+    const newSelection = getMaterialsInputTypeByMappedValue(
+      lookupKey,
+      selectedValue,
+      inputTypes,
+      props.allowedInputTypes
+    );
     if (!newSelection) {
       return;
     }
@@ -482,8 +537,29 @@ export const MaterialsInput = ({
     setInputType(newSelection);
     props.onInputTypeChange?.(newSelection);
 
-    const nextValue = getConvertedValueForInputType(newSelection, currentInputType, currentInputValue);
+    const nextValue = getConvertedValueForInputType(newSelection, currentInputType, currentInputValue, inputTypes);
     syncInputState(nextValue, newSelection);
+  };
+
+  const switchInputType = (
+    nextInputType: MaterialsInputTypeId,
+    currentInputType: MaterialsInputTypeId,
+    currentInputValue: string
+  ) => {
+    if (!inputTypes[nextInputType]) {
+      return;
+    }
+
+    setInputType(nextInputType);
+    props.onInputTypeChange?.(nextInputType);
+
+    const nextSelectionMode = inputTypes[nextInputType]?.selectionMode;
+    if (nextSelectionMode) {
+      setSelectionMode(nextSelectionMode);
+    }
+
+    const nextValue = getConvertedValueForInputType(nextInputType, currentInputType, currentInputValue, inputTypes);
+    syncInputState(nextValue, nextInputType);
   };
 
   const handleFormulaButtonClick = (valueToAppend: string) => {
@@ -513,20 +589,20 @@ export const MaterialsInput = ({
       setSelectedElements((current) => (areElementListsEqual(current, nextElements) ? current : nextElements));
       setInputValue((current) => (current === nextValue ? current : nextValue));
       setPreviousValidValue(nextValue);
-      setMaxElementsReached(isMaxSelectionValue(inputType, nextValue, props.maxElementSelectable));
+      setMaxElementsReached(isMaxSelectionValue(inputType, nextValue, props.maxElementSelectable, inputTypes));
       setError(null);
     },
-    [inputType, inputValue, props.maxElementSelectable, selectionMode]
+    [inputType, inputTypes, inputValue, props.maxElementSelectable, selectionMode]
   );
 
   const getNextInputTypeForSelectionMode = (mode: PeriodicTableSelectionMode) => {
-    if (mode === PeriodicTableSelectionMode.CHEMICAL_SYSTEM) {
-      return MaterialsInputType.CHEMICAL_SYSTEM;
+    if (inputTypes[inputType]?.selectionMode === mode) {
+      return inputType;
     }
-    if (mode === PeriodicTableSelectionMode.FORMULA) {
-      return MaterialsInputType.FORMULA;
-    }
-    return MaterialsInputType.ELEMENTS;
+    return (
+      props.allowedInputTypes.find((candidate) => inputTypes[candidate]?.selectionMode === mode) ??
+      inputType
+    );
   };
 
   const handleSubmit = (event: FormEvent | MouseEvent, submittedValue?: string) => {
@@ -595,29 +671,29 @@ export const MaterialsInput = ({
     const previousInputType = inputType;
     setInputType(props.type);
 
-    const nextSelectionMode = materialsInputTypes[props.type]?.selectionMode;
+    const nextSelectionMode = inputTypes[props.type]?.selectionMode;
     if (hasPeriodicTable && nextSelectionMode) {
       setSelectionMode(nextSelectionMode);
     }
 
     if (inputValue && previousInputType !== props.type) {
-      const nextValue = getConvertedValueForInputType(props.type, previousInputType, inputValue);
+      const nextValue = getConvertedValueForInputType(props.type, previousInputType, inputValue, inputTypes);
       if (nextValue !== inputValue) {
         syncInputState(nextValue, props.type);
       }
     }
-  }, [hasPeriodicTable, props.type]);
+  }, [hasPeriodicTable, inputTypes, props.type]);
 
   useEffect(() => {
-    const nextSelectedElements = normalizeElementsFromValue(inputType, inputValue);
+    const nextSelectedElements = normalizeElementsFromValue(inputType, inputValue, inputTypes);
     setSelectedElements((current) =>
       current.join('|') === nextSelectedElements.join('|') ? current : nextSelectedElements
     );
-  }, [inputType, inputValue]);
+  }, [inputType, inputTypes, inputValue]);
 
   useEffect(() => {
     if (
-      inputType === MaterialsInputType.FORMULA &&
+      inputTypes[inputType]?.selectionMode === PeriodicTableSelectionMode.FORMULA &&
       inputValue &&
       props.autocompleteFormulaUrl &&
       isFocused
@@ -633,7 +709,7 @@ export const MaterialsInput = ({
         setShowInputHelp(false);
       }
     }
-  }, [inputType, inputValue, isFocused, props.autocompleteFormulaUrl, props.helpItems]);
+  }, [inputType, inputTypes, inputValue, isFocused, props.autocompleteFormulaUrl, props.helpItems]);
 
   const disableSubmitButton = !!props.loading || !!error || !inputValue;
 
@@ -789,6 +865,8 @@ export const MaterialsInput = ({
                 <PeriodicTableModeSwitcher
                   mode={selectionMode}
                   allowedModes={allowedSelectionModes}
+                  activeInputType={inputType}
+                  inputTypeSwitchItems={periodicTableInputTypeSwitchItems}
                   hideWildcardButton={props.hideWildcardButton}
                   chemicalSystemSelectHelpText={props.chemicalSystemSelectHelpText}
                   elementsSelectHelpText={props.elementsSelectHelpText}
@@ -797,11 +875,14 @@ export const MaterialsInput = ({
                     setSelectionMode(mode);
                     const nextInputType = getNextInputTypeForSelectionMode(mode);
                     convertSelectionToInputType(
-                      materialsInputTypes[nextInputType]?.selectionMode,
+                      inputTypes[nextInputType]?.selectionMode,
                       'selectionMode',
                       inputType,
                       inputValue
                     );
+                  }}
+                  onInputTypeSwitch={(item) => {
+                    switchInputType(item.id, inputType, inputValue);
                   }}
                   onFormulaButtonClick={handleFormulaButtonClick}
                 />
@@ -826,5 +907,5 @@ export const MaterialsInput = ({
   );
 };
 
-export { MaterialsInputType };
-export type { InputHelpItem };
+export { MaterialsInputType, PeriodicTableSelectionMode, validateChemicalSystem };
+export type { InputHelpItem, MaterialsInputTypeId, MaterialsInputTypeOption, MaterialsInputTypesMap };

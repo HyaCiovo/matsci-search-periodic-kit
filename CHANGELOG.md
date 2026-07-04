@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## 0.0.7 - 2026-07-04
+
+Package: `@gnosys/matsci-search-periodic-kit`
+
+- Support custom periodic-table input type ids/options for exact and subset chemical-system modes
+
+
 ## 0.0.6 - 2026-06-22
 
 Package: `@gnosys/matsci-search-periodic-kit`

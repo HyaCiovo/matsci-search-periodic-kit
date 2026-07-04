@@ -8,6 +8,8 @@ export enum MaterialsInputType {
   MOLECULE_FORMULA = 'molecule_formula',
 }
 
+export type MaterialsInputTypeId = MaterialsInputType | (string & {});
+
 export enum PeriodicTableSelectionMode {
   ELEMENTS = 'elements',
   CHEMICAL_SYSTEM = 'chemical_system',
@@ -184,35 +186,50 @@ export const matchesMaterialIdPrefix = (value: string, prefixes: string[] = []):
 };
 
 export const validateInputLength = (
-  parsedValue: string | string[] | undefined | null,
-  type: MaterialsInputType | null,
-  maxElements?: number
+  parsedValue: unknown,
+  type: MaterialsInputTypeId | null,
+  maxElements?: number,
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes
 ): boolean => {
-  switch (type) {
-    case MaterialsInputType.CHEMICAL_SYSTEM:
-    case MaterialsInputType.ELEMENTS:
-    case MaterialsInputType.FORMULA:
-      return !(maxElements && parsedValue && parsedValue.length > maxElements);
+  switch (type ? inputTypes[type]?.selectionMode : null) {
+    case PeriodicTableSelectionMode.CHEMICAL_SYSTEM:
+    case PeriodicTableSelectionMode.ELEMENTS:
+    case PeriodicTableSelectionMode.FORMULA:
+      return !(maxElements && Array.isArray(parsedValue) && parsedValue.length > maxElements);
     default:
       return true;
   }
 };
 
-export type MaterialsInputTypesMap = Partial<Record<MaterialsInputType, any>>;
+export interface MaterialsInputTypeOption {
+  id: MaterialsInputTypeId;
+  validate: (value: string) => unknown;
+  order?: number;
+  selectionMode?: PeriodicTableSelectionMode;
+  dropdownValue: string;
+  elementsOnlyDropdownValue?: string;
+  isMaterialId?: boolean;
+}
+
+export type MaterialsInputTypesMap = Record<string, MaterialsInputTypeOption | undefined>;
 
 export const materialsInputTypes: MaterialsInputTypesMap = {
   [MaterialsInputType.MID]: {
+    id: MaterialsInputType.MID,
     validate: validateMID,
     order: 1,
     dropdownValue: 'Material ID',
+    isMaterialId: true,
   },
   [MaterialsInputType.FORMULA]: {
+    id: MaterialsInputType.FORMULA,
     validate: validateFormula,
     order: 2,
     selectionMode: PeriodicTableSelectionMode.FORMULA,
     dropdownValue: 'Formula',
   },
   [MaterialsInputType.CHEMICAL_SYSTEM]: {
+    id: MaterialsInputType.CHEMICAL_SYSTEM,
     validate: validateChemicalSystem,
     order: 3,
     selectionMode: PeriodicTableSelectionMode.CHEMICAL_SYSTEM,
@@ -220,6 +237,7 @@ export const materialsInputTypes: MaterialsInputTypesMap = {
     elementsOnlyDropdownValue: 'Only',
   },
   [MaterialsInputType.ELEMENTS]: {
+    id: MaterialsInputType.ELEMENTS,
     validate: validateElementsList,
     order: 4,
     selectionMode: PeriodicTableSelectionMode.ELEMENTS,
@@ -227,47 +245,64 @@ export const materialsInputTypes: MaterialsInputTypesMap = {
     elementsOnlyDropdownValue: 'At least',
   },
   [MaterialsInputType.MOLECULE_FORMULA]: {
+    id: MaterialsInputType.MOLECULE_FORMULA,
     validate: validateMoleculeFormula,
     order: 5,
     dropdownValue: 'Molecule Formula',
   },
   [MaterialsInputType.SMILES]: {
+    id: MaterialsInputType.SMILES,
     validate: validateSmiles,
     order: 6,
     dropdownValue: 'SMILES',
   },
   [MaterialsInputType.TEXT]: {
+    id: MaterialsInputType.TEXT,
     validate: () => true,
     order: 7,
     dropdownValue: 'Text',
   },
 };
 
-const sortInputTypes = (a: MaterialsInputType, b: MaterialsInputType) => {
-  const orderA = materialsInputTypes[a]?.order ?? 0;
-  const orderB = materialsInputTypes[b]?.order ?? 0;
+export const resolveMaterialsInputTypes = (
+  customOptions: MaterialsInputTypeOption[] = []
+): MaterialsInputTypesMap => {
+  const next: MaterialsInputTypesMap = { ...materialsInputTypes };
+  for (const option of customOptions) {
+    next[option.id] = option;
+  }
+  return next;
+};
+
+const sortInputTypes = (inputTypes: MaterialsInputTypesMap) => (a: MaterialsInputTypeId, b: MaterialsInputTypeId) => {
+  const orderA = inputTypes[a]?.order ?? 0;
+  const orderB = inputTypes[b]?.order ?? 0;
   return orderA < orderB ? -1 : orderA > orderB ? 1 : 0;
 };
 
+const isMaterialIdInputType = (inputTypes: MaterialsInputTypesMap, type: MaterialsInputTypeId) =>
+  type === MaterialsInputType.MID || inputTypes[type]?.isMaterialId === true;
+
 export const detectAndValidateInputType = (
   value: string,
-  allowedInputTypes: MaterialsInputType[],
-  materialIdPrefixes: string[] = []
-): [MaterialsInputType | null, any] => {
-  if (
-    allowedInputTypes.includes(MaterialsInputType.MID) &&
-    matchesMaterialIdPrefix(value, materialIdPrefixes)
-  ) {
-    return [MaterialsInputType.MID, validateMID(value)];
+  allowedInputTypes: MaterialsInputTypeId[],
+  materialIdPrefixes: string[] = [],
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes
+): [MaterialsInputTypeId | null, unknown] => {
+  if (matchesMaterialIdPrefix(value, materialIdPrefixes)) {
+    const materialIdInputType = allowedInputTypes.find((inputType) => isMaterialIdInputType(inputTypes, inputType));
+    if (materialIdInputType) {
+      return [materialIdInputType, inputTypes[materialIdInputType]?.validate(value) ?? validateMID(value)];
+    }
   }
 
-  const sortedAllowedInputTypes = [...allowedInputTypes].sort(sortInputTypes);
+  const sortedAllowedInputTypes = [...allowedInputTypes].sort(sortInputTypes(inputTypes));
   for (const inputType of sortedAllowedInputTypes) {
-    if (inputType === MaterialsInputType.MID) {
+    if (isMaterialIdInputType(inputTypes, inputType)) {
       continue;
     }
 
-    const parsedValue = materialsInputTypes[inputType]?.validate(value);
+    const parsedValue = inputTypes[inputType]?.validate(value);
     if (parsedValue) {
       return [inputType, parsedValue];
     }
@@ -275,26 +310,32 @@ export const detectAndValidateInputType = (
   return [null, null];
 };
 
-export const getAllowedSelectionModes = (allowedInputTypes: MaterialsInputType[]) => {
+export const getAllowedSelectionModes = (
+  allowedInputTypes: MaterialsInputTypeId[],
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes
+) => {
   const allowedModes: PeriodicTableSelectionMode[] = [];
 
-  if (allowedInputTypes.includes(MaterialsInputType.CHEMICAL_SYSTEM)) {
-    allowedModes.push(PeriodicTableSelectionMode.CHEMICAL_SYSTEM);
-  }
-  if (allowedInputTypes.includes(MaterialsInputType.ELEMENTS)) {
-    allowedModes.push(PeriodicTableSelectionMode.ELEMENTS);
-  }
-  if (allowedInputTypes.includes(MaterialsInputType.FORMULA)) {
-    allowedModes.push(PeriodicTableSelectionMode.FORMULA);
+  for (const inputType of allowedInputTypes) {
+    const selectionMode = inputTypes[inputType]?.selectionMode;
+    if (selectionMode && !allowedModes.includes(selectionMode)) {
+      allowedModes.push(selectionMode);
+    }
   }
 
   return allowedModes;
 };
 
-export const getMaterialsInputTypeByMappedValue = (key: string, value: any) => {
-  for (const inputType in materialsInputTypes) {
-    if (materialsInputTypes[inputType as MaterialsInputType]?.[key] === value) {
-      return inputType as MaterialsInputType;
+export const getMaterialsInputTypeByMappedValue = (
+  key: string,
+  value: unknown,
+  inputTypes: MaterialsInputTypesMap = materialsInputTypes,
+  allowedInputTypes?: MaterialsInputTypeId[]
+) => {
+  const candidates = allowedInputTypes ?? Object.keys(inputTypes);
+  for (const inputType of candidates) {
+    if ((inputTypes[inputType] as Record<string, unknown> | undefined)?.[key] === value) {
+      return inputType;
     }
   }
 };
