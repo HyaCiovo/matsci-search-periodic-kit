@@ -2,6 +2,14 @@
 
 All notable changes to this package will be documented in this file.
 
+## 0.0.8 - 2026-08-21
+
+Package: `@gnosys/matsci-search-periodic-kit`
+
+- Include all CSS dependencies in published style subpaths.
+- Add configurable periodic table reference axes through `showAxes`.
+
+
 ## 0.0.7 - 2026-07-04
 
 Package: `@gnosys/matsci-search-periodic-kit`

@@ -3,14 +3,15 @@ import path from 'node:path';
 
 const cwd = process.cwd();
 const srcStylesDir = path.join(cwd, 'src/styles');
-const distDir = path.join(cwd, 'dist');
+const distStylesDir = path.join(cwd, 'dist/styles');
 
-await mkdir(distDir, { recursive: true });
+await mkdir(distStylesDir, { recursive: true });
 
 for (const entry of await readdir(srcStylesDir, { withFileTypes: true })) {
   if (!entry.isFile() || !entry.name.endsWith('.css')) {
     continue;
   }
 
-  await cp(path.join(srcStylesDir, entry.name), path.join(distDir, entry.name));
+  // Keep relative imports inside the published styles resolvable.
+  await cp(path.join(srcStylesDir, entry.name), path.join(distStylesDir, entry.name));
 }

@@ -22,6 +22,106 @@
   --ms-pt-color-noble-gas: #9191cd;
   --ms-pt-color-lanthanoid-transition: #edd800;
   --ms-pt-color-actinoid-transition: #f9af00;
+  --ms-periodic-table-axis-size: 1.25rem;
+  --ms-periodic-table-axis-gap: 0.25rem;
+  --ms-periodic-table-axis-top-size: var(--ms-periodic-table-axis-size);
+  --ms-periodic-table-axis-left-size: var(--ms-periodic-table-axis-size);
+  --ms-periodic-table-axis-color: currentColor;
+  --ms-periodic-table-axis-background: transparent;
+  --ms-periodic-table-axis-radius: 0;
+  --ms-periodic-table-axis-font-size: 0.75rem;
+  --ms-periodic-table-axis-column-gap: var(--ms-pt-gap-spaced);
+  --ms-periodic-table-axis-row-gap: var(--ms-pt-gap-spaced);
+  --ms-periodic-table-axis-row-size: var(--ms-pt-element-size-spaced);
+  --ms-periodic-table-axis-spacer-size: var(--ms-pt-spacer-spaced);
+}
+
+.ms-selectable-table[data-table-layout='compact'] {
+  --ms-periodic-table-axis-column-gap: var(--ms-pt-gap-compact);
+  --ms-periodic-table-axis-row-gap: var(--ms-pt-gap-compact);
+  --ms-periodic-table-axis-row-size: var(--ms-pt-element-size-compact);
+  --ms-periodic-table-axis-spacer-size: var(--ms-pt-spacer-compact);
+}
+
+.ms-selectable-table[data-table-layout='mini'] {
+  --ms-periodic-table-axis-column-gap: var(--ms-pt-gap-small);
+  --ms-periodic-table-axis-row-gap: var(--ms-pt-gap-small);
+  --ms-periodic-table-axis-row-size: var(--ms-pt-element-size-small);
+  --ms-periodic-table-axis-spacer-size: var(--ms-pt-spacer-small);
+}
+
+.ms-selectable-table[data-table-layout='map'] {
+  --ms-periodic-table-axis-column-gap: var(--ms-pt-gap-map);
+  --ms-periodic-table-axis-row-gap: var(--ms-pt-gap-map);
+  --ms-periodic-table-axis-row-size: var(--ms-pt-element-size-map);
+  --ms-periodic-table-axis-spacer-size: var(--ms-pt-spacer-small);
+}
+
+.ms-selectable-table__frame {
+  --ms-periodic-table-axis-top-track: 0px;
+  --ms-periodic-table-axis-left-track: 0px;
+  --ms-periodic-table-axis-top-gap: 0px;
+  --ms-periodic-table-axis-left-gap: 0px;
+  display: grid;
+  grid-template-columns: var(--ms-periodic-table-axis-left-track) minmax(0, 1fr);
+  grid-template-rows: var(--ms-periodic-table-axis-top-track) minmax(0, 1fr);
+  column-gap: var(--ms-periodic-table-axis-left-gap);
+  row-gap: var(--ms-periodic-table-axis-top-gap);
+  min-width: 0;
+}
+
+.ms-selectable-table__frame--with-top-axis {
+  --ms-periodic-table-axis-top-track: var(--ms-periodic-table-axis-top-size);
+  --ms-periodic-table-axis-top-gap: var(--ms-periodic-table-axis-gap);
+}
+
+.ms-selectable-table__frame--with-left-axis {
+  --ms-periodic-table-axis-left-track: var(--ms-periodic-table-axis-left-size);
+  --ms-periodic-table-axis-left-gap: var(--ms-periodic-table-axis-gap);
+}
+
+.ms-selectable-table__frame > .ms-table-container {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+}
+
+.ms-periodic-table-axis {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--ms-periodic-table-axis-color);
+  background: var(--ms-periodic-table-axis-background);
+  border-radius: var(--ms-periodic-table-axis-radius);
+  font-size: var(--ms-periodic-table-axis-font-size);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ms-periodic-table-axis--top {
+  grid-column: 2;
+  grid-row: 1;
+  grid-template-columns: repeat(18, minmax(0, 1fr));
+  column-gap: var(--ms-periodic-table-axis-column-gap);
+}
+
+.ms-periodic-table-axis--left {
+  grid-column: 1;
+  grid-row: 2;
+  grid-template-rows: repeat(7, var(--ms-periodic-table-axis-row-size)) var(--ms-periodic-table-axis-spacer-size) repeat(2, var(--ms-periodic-table-axis-row-size));
+  row-gap: var(--ms-periodic-table-axis-row-gap);
+}
+
+.ms-periodic-table-axis__tick {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
 }
 
 .ms-mat-element {

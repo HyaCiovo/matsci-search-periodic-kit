@@ -65,6 +65,25 @@ const DisableForwardChangeButton = () => {
 };
 
 describe('SelectableTable compatibility', () => {
+  it('keeps reference axes hidden by default and supports separate axis visibility', () => {
+    const { rerender } = render(<SelectableTable maxElementSelectable={5} />);
+
+    expect(screen.queryByTestId('periodic-table-axis-top')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('periodic-table-axis-left')).not.toBeInTheDocument();
+
+    rerender(<SelectableTable maxElementSelectable={5} showAxes={{ top: true }} />);
+
+    expect(screen.getByTestId('periodic-table-axis-top')).toHaveTextContent('123456789101112131415161718');
+    expect(screen.queryByTestId('periodic-table-axis-left')).not.toBeInTheDocument();
+  });
+
+  it('renders both reference axes when showAxes is enabled', () => {
+    render(<SelectableTable maxElementSelectable={5} showAxes />);
+
+    expect(screen.getByTestId('periodic-table-axis-top').children).toHaveLength(18);
+    expect(screen.getByTestId('periodic-table-axis-left').children).toHaveLength(10);
+  });
+
   it('emits the current selection state once on mount to match the legacy callback contract', () => {
     const handleStateChange = vi.fn();
 

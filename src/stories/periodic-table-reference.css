@@ -14,13 +14,19 @@
 .ms-pt-reference-table {
   --ms-pt-element-size-spaced: 56px;
   --ms-pt-spacer-spaced: 4px;
-  --ms-pt-reference-sidebar-width: 1.25rem;
-  --ms-pt-reference-topbar-height: 1.25rem;
   --ms-pt-reference-column-gap: 0.16rem;
   --ms-pt-reference-row-gap: 0.1rem;
-  --ms-pt-reference-bar-background: #d7d8dc;
-  --ms-pt-reference-bar-foreground: #3f4650;
-  --ms-pt-reference-bar-radius: 0.45rem;
+  --ms-periodic-table-axis-top-size: 1.25rem;
+  --ms-periodic-table-axis-left-size: 1.25rem;
+  --ms-periodic-table-axis-gap: 0.28rem;
+  --ms-periodic-table-axis-color: #3f4650;
+  --ms-periodic-table-axis-background: #d7d8dc;
+  --ms-periodic-table-axis-radius: 0.45rem;
+  --ms-periodic-table-axis-font-size: 0.76rem;
+  --ms-periodic-table-axis-column-gap: var(--ms-pt-reference-column-gap);
+  --ms-periodic-table-axis-row-gap: var(--ms-pt-reference-row-gap);
+  --ms-periodic-table-axis-row-size: var(--ms-pt-element-size-spaced);
+  --ms-periodic-table-axis-spacer-size: var(--ms-pt-spacer-spaced);
   --ms-pt-reference-number-font-size: 0.72rem;
   --ms-pt-reference-symbol-font-size: 1.42rem;
   --ms-pt-reference-name-font-size: 0.68rem;
@@ -28,76 +34,15 @@
   --ms-pt-reference-accent-bottom: 0.02rem;
   --ms-pt-reference-group-number-top: 0.16rem;
   --ms-pt-reference-group-symbol-top: 1.08rem;
-  --ms-pt-reference-total-height: calc(
-    (9 * var(--ms-pt-element-size-spaced)) + var(--ms-pt-spacer-spaced) + (9 * var(--ms-pt-reference-row-gap))
-  );
-  position: relative;
   width: max-content;
   min-width: 0;
-  padding: calc(var(--ms-pt-reference-topbar-height) + 0.28rem) 0 0
-    calc(var(--ms-pt-reference-sidebar-width) + 0.28rem);
 }
 
 .ms-pt-reference-table .ms-table-container.ms-spaced {
-  position: relative;
   width: max-content;
-  z-index: 1;
   grid-template-columns: repeat(18, var(--ms-pt-element-size-spaced));
   grid-template-rows: repeat(7, var(--ms-pt-element-size-spaced)) var(--ms-pt-spacer-spaced) repeat(2, var(--ms-pt-element-size-spaced));
   gap: var(--ms-pt-reference-row-gap) var(--ms-pt-reference-column-gap);
-}
-
-.ms-pt-reference-topbar {
-  position: absolute;
-  top: 0;
-  left: calc(var(--ms-pt-reference-sidebar-width) + 0.28rem);
-  right: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.ms-pt-reference-sidebar {
-  position: absolute;
-  top: calc(var(--ms-pt-reference-topbar-height) + 0.28rem);
-  left: 0;
-  width: var(--ms-pt-reference-sidebar-width);
-  height: var(--ms-pt-reference-total-height);
-  z-index: 0;
-  pointer-events: none;
-}
-
-.ms-pt-reference-topbar-track,
-.ms-pt-reference-sidebar-track {
-  background: var(--ms-pt-reference-bar-background);
-  border-radius: var(--ms-pt-reference-bar-radius);
-  color: var(--ms-pt-reference-bar-foreground);
-}
-
-.ms-pt-reference-topbar-track {
-  display: grid;
-  grid-template-columns: repeat(18, minmax(0, 1fr));
-  column-gap: var(--ms-pt-reference-column-gap);
-  align-items: center;
-  height: var(--ms-pt-reference-topbar-height);
-  padding-inline: 0.03rem;
-}
-
-.ms-pt-reference-sidebar-track {
-  display: grid;
-  grid-template-rows: repeat(7, var(--ms-pt-element-size-spaced)) 1fr;
-  row-gap: var(--ms-pt-reference-row-gap);
-  align-items: center;
-  height: 100%;
-  padding-block: 0.03rem;
-}
-
-.ms-pt-reference-bar-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.76rem;
-  line-height: 1;
-  font-weight: 500;
 }
 
 .ms-pt-reference-table .ms-element-description,

@@ -6,36 +6,9 @@ import { TableLayout } from '../components/SelectableTable';
 import { TABLE_V2 } from '../data/periodic-table/table-v2';
 import './periodic-table-reference.css';
 
-const GROUP_NUMBERS = Array.from({ length: 18 }, (_, index) => index + 1);
-const PERIOD_NUMBERS = Array.from({ length: 7 }, (_, index) => index + 1);
 const POST_118_SYMBOLS = TABLE_V2.filter(
   (element) => typeof element.number === 'number' && element.number > 118
 ).map((element) => element.symbol);
-
-function PeriodicTableReferenceBars() {
-  return (
-    <>
-      <div className="ms-pt-reference-topbar" aria-hidden="true">
-        <div className="ms-pt-reference-topbar-track">
-          {GROUP_NUMBERS.map((value) => (
-            <span key={value} className="ms-pt-reference-bar-cell">
-              {value}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="ms-pt-reference-sidebar" aria-hidden="true">
-        <div className="ms-pt-reference-sidebar-track">
-          {PERIOD_NUMBERS.map((value) => (
-            <span key={value} className="ms-pt-reference-bar-cell">
-              {value}
-            </span>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
 
 type ReferenceLocale = 'zh-CN' | 'en-US';
 
@@ -70,6 +43,7 @@ const meta = {
   args: {
     maxElementSelectable: 6,
     forceTableLayout: TableLayout.FULL,
+    showAxes: true,
     locale: 'zh-CN',
   },
   argTypes: {
@@ -108,9 +82,7 @@ export const StyledReference: Story = {
           onStateChange={(nextState) => {
             setEnabledElements(Array.isArray(nextState) ? nextState : nextState.enabledElements);
           }}
-        >
-          <PeriodicTableReferenceBars />
-        </PeriodicTable>
+        />
         <div className="ms-pt-reference-selection">
           {referenceTexts.selectedLabel}: {enabledElements.length > 0 ? enabledElements.join(', ') : referenceTexts.noneLabel}
         </div>
