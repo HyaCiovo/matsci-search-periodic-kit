@@ -91,6 +91,23 @@ describe('MaterialsInput', () => {
     });
   });
 
+  it('preserves formula stoichiometry when adding an element from the periodic table', () => {
+    render(
+      <MaterialsInput
+        value=""
+        type={MaterialsInputType.FORMULA}
+        allowedInputTypes={[MaterialsInputType.FORMULA]}
+        showSubmitButton
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('periodic-element-Ti'));
+    fireEvent.click(screen.getByRole('button', { name: '2' }));
+    fireEvent.click(screen.getByTestId('periodic-element-O'));
+
+    expect(screen.getByTestId('materials-input-search-input')).toHaveValue('Ti2O');
+  });
+
   it('uses help examples to populate the input with validated values', () => {
     render(
       <MaterialsInput

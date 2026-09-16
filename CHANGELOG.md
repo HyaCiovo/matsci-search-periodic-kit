@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## 0.0.9 - 2026-09-16
+
+Package: `@gnosys/matsci-search-periodic-kit`
+
+- Fix formula stoichiometry being lost when adding elements from the periodic table.
+
+
 ## 0.0.8 - 2026-08-21
 
 Package: `@gnosys/matsci-search-periodic-kit`

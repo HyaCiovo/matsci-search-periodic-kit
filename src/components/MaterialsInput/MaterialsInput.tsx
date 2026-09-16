@@ -133,6 +133,20 @@ const renderPeriodicTableValue = (mode: PeriodicTableSelectionMode, elements: st
   return arrayToDelimitedString(elements, /,/);
 };
 
+const getFormulaValueAfterTableChange = (
+  currentValue: string,
+  currentElements: string[],
+  nextElements: string[]
+) => {
+  const hasRemovedElement = currentElements.some((element) => !nextElements.includes(element));
+  if (hasRemovedElement) {
+    return nextElements.join('');
+  }
+
+  const addedElements = nextElements.filter((element) => !currentElements.includes(element));
+  return addedElements.length > 0 ? `${currentValue}${addedElements.join('')}` : currentValue;
+};
+
 const isMaxSelectionValue = (
   type: MaterialsInputTypeId | null,
   value: string,
@@ -584,7 +598,12 @@ export const MaterialsInput = ({
             ? [...nextElements, ...wildcards]
             : nextElements
           : nextElements;
-      const nextValue = renderPeriodicTableValue(selectionMode, elementsForRender);
+      const currentElements = normalizeElementsFromValue(inputType, inputValue, inputTypes);
+      const canPreserveFormula = areElementListsEqual(currentElements, selectedElements);
+      const nextValue =
+        selectionMode === PeriodicTableSelectionMode.FORMULA && canPreserveFormula
+          ? getFormulaValueAfterTableChange(inputValue, currentElements, nextElements)
+          : renderPeriodicTableValue(selectionMode, elementsForRender);
 
       setSelectedElements((current) => (areElementListsEqual(current, nextElements) ? current : nextElements));
       setInputValue((current) => (current === nextValue ? current : nextValue));
@@ -592,7 +611,7 @@ export const MaterialsInput = ({
       setMaxElementsReached(isMaxSelectionValue(inputType, nextValue, props.maxElementSelectable, inputTypes));
       setError(null);
     },
-    [inputType, inputTypes, inputValue, props.maxElementSelectable, selectionMode]
+    [inputType, inputTypes, inputValue, props.maxElementSelectable, selectedElements, selectionMode]
   );
 
   const getNextInputTypeForSelectionMode = (mode: PeriodicTableSelectionMode) => {
