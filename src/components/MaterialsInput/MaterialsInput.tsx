@@ -133,14 +133,90 @@ const renderPeriodicTableValue = (mode: PeriodicTableSelectionMode, elements: st
   return arrayToDelimitedString(elements, /,/);
 };
 
+const removeDeselectedFormulaElements = (formula: string, removedElements: Set<string>) => {
+  let index = 0;
+
+  const readStoichiometry = () => {
+    const start = index;
+    while (index < formula.length && /[\d.]/.test(formula[index])) {
+      index += 1;
+    }
+    return formula.slice(start, index);
+  };
+
+  const readSequence = (insideGroup: boolean): { value: string; closed: boolean } => {
+    let value = '';
+
+    while (index < formula.length) {
+      const character = formula[index];
+
+      if (character === ')') {
+        if (insideGroup) {
+          index += 1;
+          return { value, closed: true };
+        }
+
+        index += 1;
+        value += `)${readStoichiometry()}`;
+        continue;
+      }
+
+      if (character === '(') {
+        index += 1;
+        const group = readSequence(true);
+        if (!group.closed) {
+          value += `(${group.value}`;
+          continue;
+        }
+
+        const groupStoichiometry = readStoichiometry();
+        if (group.value) {
+          value += `(${group.value})${groupStoichiometry}`;
+        }
+        continue;
+      }
+
+      if (character === '*') {
+        index += 1;
+        value += `*${readStoichiometry()}`;
+        continue;
+      }
+
+      if (/[A-Z]/.test(character)) {
+        const start = index;
+        index += 1;
+        while (index < formula.length && /[a-z]/.test(formula[index])) {
+          index += 1;
+        }
+
+        const symbol = formula.slice(start, index);
+        const stoichiometry = readStoichiometry();
+        if (!removedElements.has(symbol)) {
+          value += `${symbol}${stoichiometry}`;
+        }
+        continue;
+      }
+
+      value += character;
+      index += 1;
+    }
+
+    return { value, closed: false };
+  };
+
+  return readSequence(false).value;
+};
+
 const getFormulaValueAfterTableChange = (
   currentValue: string,
   currentElements: string[],
   nextElements: string[]
 ) => {
-  const hasRemovedElement = currentElements.some((element) => !nextElements.includes(element));
-  if (hasRemovedElement) {
-    return nextElements.join('');
+  const nextElementSet = new Set(nextElements);
+  const removedElements = currentElements.filter((element) => !nextElementSet.has(element));
+  if (removedElements.length > 0) {
+    const compactFormula = currentValue.replace(/\s+/g, '');
+    return removeDeselectedFormulaElements(compactFormula, new Set(removedElements));
   }
 
   const addedElements = nextElements.filter((element) => !currentElements.includes(element));

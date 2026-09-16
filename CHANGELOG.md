@@ -2,6 +2,22 @@
 
 All notable changes to this package will be documented in this file.
 
+## 0.0.11 - 2026-09-16
+
+Package: `@gnosys/matsci-search-periodic-kit`
+
+- Preserve wildcard and parenthetical formula structure when periodic-table selections are removed.
+- Remove only the deselected element and its attached stoichiometric suffix, including nested parenthetical groups that become empty.
+
+
+## 0.0.10 - 2026-09-16
+
+Package: `@gnosys/matsci-search-periodic-kit`
+
+- Preserve each element's stoichiometric suffix when periodic-table selections are removed.
+- Deselecting Ti from Ti2O now leaves O, while deselecting O leaves Ti2.
+
+
 ## 0.0.9 - 2026-09-16
 
 Package: `@gnosys/matsci-search-periodic-kit`
